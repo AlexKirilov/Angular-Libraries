@@ -1,0 +1,7 @@
+@import '../../generic-table-style.scss';
+
+.table-cell-td,
+.table-cell-th {
+    border-right: 1px solid #eeeeee8f;
+    padding-left: 5px;
+}

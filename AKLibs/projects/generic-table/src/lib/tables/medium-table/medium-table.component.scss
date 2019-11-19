@@ -1,0 +1,13 @@
+@import '../../generic-table-style.scss';
+@import "../../palette.scss";
+
+.column-title {
+    text-transform: capitalize;
+    color: $table-column-title;
+    font-weight: normal;
+    min-width: 110px;
+}
+
+.activeSort {
+    color: #2195F2;
+}

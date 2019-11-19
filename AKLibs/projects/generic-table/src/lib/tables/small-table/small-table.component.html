@@ -1,0 +1,149 @@
+<div class="mat-elevation-z8">
+    <!-- Large Table -->
+    <table mat-table id="g-small-table" [dataSource]="dataSource">
+  
+      <ng-container *ngFor="let columns of smallTableColumn; let i = index" matColumnDef="{{columns}}">
+  
+        <!-- Header -->
+        <th mat-header-cell *matHeaderCellDef id="g-th-{{smallTableColumn[i]}}" class="table-cell-th">
+          <div *ngIf="i == 0 && dataSource.data.length > 2" fxLayout="row" fxLayoutAlign="start center">
+            <div *ngIf="isSelected" id="selecDeselectAll">
+              <mat-checkbox [(ngModel)]="cbSelectAll" [checked]="cbSelectAll" (change)="selectAllRecords()"
+                matTooltip="Select/Deselect All" matTooltipPosition="above" onclick="event.stopPropagation();">
+              </mat-checkbox>
+            </div>
+  
+            <div class="icon-txt-container" style="margin: auto 20px" fxLayout="column" fxLayoutAlign="center center">
+              <ng-container *ngTemplateOutlet="sortingIcon"></ng-container>
+            </div>
+  
+            <div class="currency-display"
+              *ngIf="settings?.currencyType === 'combine' || settings?.currencyType === 'inHeader'">
+              Currency: ({{ currency }})
+            </div>
+          </div>
+        </th>
+  
+        <!-- Table Cells-->
+        <td mat-cell *matCellDef="let row; let i = index" id="g-small-td-{{i}}" class="table-cell-td">
+          <ul>
+            <li *ngFor="let col of tableColumnNames[columns]" [class.extractFromColumn]="col === 'selected'"
+              [class.extractSymbolCol]="col === 'warning'" id="{{col}}" fxLayout="row" fxLayoutAlign="start center"
+              fxLayoutGap="10px">
+  
+              <span class="column-title" *ngIf="col !== 'selected' && col != 'warning' && !inputFields.includes(col)">
+                {{ col }}:
+              </span>
+  
+              <!-- CheckBox column -->
+              <div *ngIf="col === 'selected'" class="leftSide" id="g-row-cb-{{row.id}}">
+                <mat-checkbox [checked]="row[col]" (change)="checkRowReq(row)" onclick="event.stopPropagation();"
+                  id="g-ch-{{row.id}}">
+                </mat-checkbox>
+              </div>
+  
+              <!-- Input Field Column -->
+              <div *ngIf="inputFields.includes(col)" id="row-input-{{row.id}}">
+                <mat-form-field class="nested-input">
+                  <input matInput type="number" [(ngModel)]="row[col]" placeholder="{{col}}"
+                    (change)="changeInputData(row, col)" onclick="event.stopPropagation();" id="input-{{col}}">
+                </mat-form-field>
+              </div>
+  
+              <!-- Numeric Column -->
+              <ak-numeric-with-currency *ngIf="numberCorrectionList.includes(col)" [num]="row[col]" [col]="col"
+                [currencyType]="settings?.currencyType" [indicator]="settings?.indicator" [currency]="settings?.currency">
+              </ak-numeric-with-currency>
+  
+              <!-- Date column -->
+              <ak-date-cells *ngIf="dateTransformNames.includes(col)" [isFullDate]="fullDate" [colName]="col"
+                [cellId]="row.id" [date]="row[col]"></ak-date-cells>
+  
+              <!-- Cell Control Buttons -->
+              <ak-table-row-ctrl-btns *ngIf="col === 'ctrl'" [row]="row" [editableRowId]="selectedRecord"
+                (editRowReq)="editRecord($event)" (saveRowReq)="saveRecord($event)" (removeRowReq)="removeRecord($event)">
+              </ak-table-row-ctrl-btns>
+  
+              <!-- Text with dots and ToolTip -->
+              <span class="txt-column-{{col}}" [class.leftSide]="leftSideArr.includes(col)"
+                id="row-{{col}}-span-{{row.id}}" *ngIf="columnsWithToolTip.includes(col)"
+                [class.recalculate]="row.clientRecalculation" [matTooltip]="row[col]" matTooltipPosition="above">
+                {{row[col]}}
+              </span>
+  
+              <!-- All Remaining columns -->
+              <span class="txt-column-{{col}}" [class.leftSide]="leftSideArr.includes(col)"
+                id="row-{{col}}-span-{{row.id}}" [class.recalculate]="row.clientRecalculation" *ngIf="!columnsWithToolTip.includes(col) && !dateTransformNames.includes(col) && 
+        !numberCorrectionList.includes(col) && !inputFields.includes(col) && col !== 'selected' && col !== 'ctrl'">
+                {{row[col]}}
+              </span>
+  
+            </li>
+          </ul>
+        </td>
+      </ng-container>
+  
+      <tr mat-header-row *matHeaderRowDef="smallTableColumn"></tr>
+      <tr mat-row *matRowDef="let row; columns: smallTableColumn; let i = index" (click)="selectRow(row)"
+        [class.active]="selectedRecord == row && clickableRows" [class.Verbose]="row.level == 'Verbose'"
+        [class.Debug]="row.level == 'Debug'" [class.Warning]="row.level == 'Warning'" [class.Error]="row.level == 'Error'"
+        [class.Fatal]="row.level == 'Fatal'" [class.Information]="row.level == 'Information'"></tr>
+  
+    </table>
+  
+    <mat-paginator [pageSizeOptions]="[5, 10, 25, 50, 100]" showFirstLastButtons [class.hide]="isServerSide || true">
+    </mat-paginator>
+  </div>
+  
+  
+  <ng-template #sortingIcon>
+  
+    <button matSuffix mat-icon-button [matMenuTriggerFor]="searchTypeMenu" id="sort-by-column-btn">
+      <!-- Ascending -->
+      <div *ngIf="sortDirection == -1" class="sorting-sm-md-icon">
+        <mat-icon svgIcon="sortAscIcon" id="dragIndicator-svg-icon" matTooltip="Sort By" matTooltipPosition="above">
+        </mat-icon>
+      </div>
+  
+      <!-- Decending -->
+      <div *ngIf="sortDirection === 1" class="sorting-sm-md-icon">
+        <mat-icon svgIcon="sortDescIcon" id="dragIndicator-svg-icon" matTooltip="Sort By" matTooltipPosition="above">
+        </mat-icon>
+      </div>
+    </button>
+  
+    <mat-menu #searchTypeMenu="matMenu">
+      <button mat-menu-item *ngFor="let sort of sortBy" value="{{sort}}" class="drop-sortBy" (click)="SortByColumn(sort)"
+        id="sortBy-{{sort}}" [class.activeSort]="sort == sortColumn" fxLayout="row" fxLayoutAlign="start center"
+        fxLayoutGap="10px">
+  
+        <span *ngIf="sort === sortColumn">
+          <!-- Ascending -->
+          <!-- <span *ngIf="sortDirection == -1">▲</span> -->
+          <i class="material-icons" *ngIf="sortDirection == 1"
+            style="color: #2195F2 !important; font-size: 14px; font-weight: bold;">arrow_upward</i>
+  
+          <!-- Decending -->
+          <!-- <span *ngIf="sortDirection == 1">▼</span> -->
+          <i class="material-icons" *ngIf="sortDirection == -1"
+            style="color: #2195F2 !important; font-size: 14px; font-weight: bold;">arrow_downward</i>
+        </span>
+        <span *ngIf="sort !== sortColumn">
+          <!-- Ascending -->
+          <!-- <span *ngIf="sortDirection == 1">▲</span> -->
+  
+          <i class="material-icons" *ngIf="sortDirection == -1"
+            style="color: black !important; font-size: 12px;">arrow_upward</i>
+  
+          <!-- Decending -->
+          <!-- <span *ngIf="sortDirection == -1">▼</span> -->
+  
+          <i class="material-icons" *ngIf="sortDirection == 1"
+            style="color: black !important; font-size: 12px;">arrow_downward</i>
+        </span>
+  
+        <!-- ( sort == sortColumn && sortDirection === -1) ? ' - desc' : '' -->
+        {{ originalColumnNames[sort] }}
+      </button>
+    </mat-menu>
+  </ng-template>

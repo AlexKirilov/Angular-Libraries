@@ -1,0 +1,55 @@
+#page-pagination {
+    border-bottom: 1px solid #eee;
+
+    #page-pagination-wrapper {
+        display: block;
+
+        #page-pagination-container {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            min-height: 50px;
+            padding: 0 8px;
+            flex-wrap: wrap-reverse;
+
+            #paginator-page-size {
+                display: flex;
+                align-items: baseline;
+                margin-right: 15px;
+            }
+
+            #paginator-range-actions {
+                display: flex;
+                align-items: center;
+                min-height: 44px;
+
+                button {
+                    width: 30px;
+                    cursor: pointer;
+                }
+            }
+
+            #itemsPerPage-txt {
+                font-family: Roboto, "Helvetica Neue", sans-serif;
+                font-size: 13px;
+                margin: 0 4px;
+                color: rgba(0, 0, 0, .54);
+            }
+
+            #mat-paginator-range-label {
+                font-size: 12px;
+                color: rgba(0, 0, 0, 0.54);
+                margin-right: 15px;
+            }
+
+            .goToPages {
+                line-height: 29px;
+            }
+
+        }
+    }
+    .mat-form-field {
+        width: 56px;
+        font-size: 12px;
+    }
+}

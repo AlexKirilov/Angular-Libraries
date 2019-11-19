@@ -1,0 +1,152 @@
+<section
+    id="page-pagination"
+    fxLayout="row"
+    fxLayoutAlign="start stretch"
+>
+    <div id="page-pagination-wrapper">
+        <div id="page-pagination-container">
+            <div id="paginator-page-size">
+
+                <div id="itemsPerPage-txt">Items per page:</div>
+
+                <mat-form-field>
+                    <mat-select
+                        [(ngModel)]="itemsPerPage"
+                        (selectionChange)='changeItemsPerPageTable($event)'
+                    >
+                        <mat-option [value]="5">5</mat-option>
+                        <mat-option [value]="10">10</mat-option>
+                        <mat-option [value]="25">25</mat-option>
+                        <mat-option [value]="50">50</mat-option>
+                        <mat-option [value]="100">100</mat-option>
+                    </mat-select>
+                </mat-form-field>
+
+            </div>
+
+            <div id="paginator-range-actions">
+
+                <div id="mat-paginator-range-label">{{ details }}</div>
+
+                <div class="prev">
+                    <button
+                        class="goToPages mat-paginator-navigation-previous mat-icon-button"
+                        [class.disabled]="currentPage <= 1"
+                        id="toFirstPage"
+                        [disabled]="currentPage <= 1"
+                        (click)="goToFirstPage()"
+                    >
+                        <span class="mat-button-wrapper">
+                            <!-- <i class="material-icons mat-paginator-icon">first_page</i> -->
+                            <svg
+                                _ngcontent-c16
+                                class="mat-paginator-icon"
+                                focusable="false"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    _ngcontent-c16
+                                    d="M18.41 16.59L13.82 12l4.59-4.59L17 6l-6 6 6 6zM6 6h2v12H6z"
+                                ></path>
+                            </svg>
+                        </span>
+                    </button>
+                </div>
+
+                <div class="prev">
+                    <button
+                        class="goToPages mat-paginator-navigation-previous mat-icon-button"
+                        ng-reflect-position="above"
+                        ng-reflect-message="Previous page"
+                        aria-label="Previous page"
+                        [class.disabled]="currentPage <= 1"
+                        id="toPrevPage"
+                        (click)="goToPrevPage()"
+                        [disabled]="currentPage <= 1"
+                    >
+                        <span class="mat-button-wrapper">
+                            <!-- <i class="material-icons mat-paginator-icon">chevron_left</i> -->
+                            <svg
+                                class="iconSizeSet iconColorSet"
+                                class="mat-paginator-icon"
+                                focusable="false"
+                                viewBox="0 0 24 24"
+                            >
+                                <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"></path>
+                            </svg>
+                        </span>
+                    </button>
+                </div>
+
+                <mat-form-field class="jumpToPage-container">
+                    <input
+                        matInput
+                        type="text"
+                        placeholder="Jump to"
+                        id="jumpToPage"
+                        [(ngModel)]="jumptoPage"
+                        (keyup.enter)="jumpToPage()"
+                        (keyup)="validateJumpTo()"
+                        [disabled]="maxPages == 1"
+                    >
+                </mat-form-field>
+
+                <div class="next">
+                    <button
+                        class="goToPages mat-paginator-navigation-next mat-icon-button"
+                        [class.disabled]="currentPage >= maxPages"
+                        ng-reflect-position="above"
+                        ng-reflect-message="Next page"
+                        aria-label="Next page"
+                        id="toNextPage"
+                        (click)="goToNextPage()"
+                        [disabled]="currentPage >= maxPages"
+                    >
+                        <span class="mat-button-wrapper">
+                            <!-- <i class="material-icons mat-paginator-icon">chevron_right</i> -->
+                            <svg
+                                class="iconSizeSet iconColorSet"
+                                class="mat-paginator-icon"
+                                focusable="false"
+                                viewBox="0 0 24 24"
+                            >
+                                <path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"></path>
+                            </svg>
+                        </span>
+                    </button>
+                </div>
+
+                <div class="next">
+                    <button
+                        class="goToPages mat-paginator-navigation-next mat-icon-button"
+                        [class.disabled]="currentPage >= maxPages"
+                        ng-reflect-position="above"
+                        ng-reflect-message="Last page"
+                        aria-label="Last page"
+                        id="toLastPage"
+                        (click)="goToLastPage()"
+                        [disabled]="currentPage >= maxPages"
+                    >
+                        <span class="mat-button-wrapper">
+                            <!-- <i class="material-icons mat-paginator-icon">last_page</i> -->
+                            <svg
+                                _ngcontent-c16
+                                class="mat-paginator-icon"
+                                focusable="false"
+                                viewBox="0 0 24 24"
+                            >
+                                <path
+                                    _ngcontent-c16
+                                    d="M5.59 7.41L10.18 12l-4.59 4.59L7 18l6-6-6-6zM16 6h2v12h-2z"
+                                ></path>
+                            </svg>
+                        </span>
+                    </button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</section>

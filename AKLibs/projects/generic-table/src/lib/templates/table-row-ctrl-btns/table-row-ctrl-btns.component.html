@@ -1,0 +1,35 @@
+<div
+    id="row-ctrl-{{row.id}}"
+    fxLayout="row"
+    fxLayoutAlign="center center"
+    fxLayoutGap="10px"
+>
+    <mat-icon
+        class="edit-row-btn"
+        *ngIf="editableRowId !== row.id"
+        (click)="editRow(row)"
+        matTooltip="Edit"
+        matTooltipPosition="above"
+    >
+        edit
+    </mat-icon>
+
+    <mat-icon
+        class="save-row-btn"
+        *ngIf="editableRowId === row.id"
+        (click)="saveRow(row)"
+        matTooltip="Save"
+        matTooltipPosition="above"
+    >
+        save
+    </mat-icon>
+
+    <mat-icon
+        class="remove-row-btn"
+        (click)="removeRow(row)"
+        matTooltip="Delete"
+        matTooltipPosition="above"
+    >
+        delete_forever
+    </mat-icon>
+</div>

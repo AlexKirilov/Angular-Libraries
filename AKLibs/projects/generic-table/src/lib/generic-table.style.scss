@@ -1,0 +1,125 @@
+@import "./palette.scss";
+
+
+.mat-elevation-z8 {
+    box-shadow: none;
+    display: flow-root;
+}
+
+#result-table {
+    .results-paginator {
+        display: flex;
+        line-height: 40px;
+        font-size: 12px;
+        float: right;
+
+        &.second-pagination {
+            margin-top: 30px;
+        }
+
+        .itemsPerPage,
+        .mat-paginator-range-label {
+            margin: 0 10px;
+        }
+
+        svg {
+            width: 30px;
+            height: 30px;
+        }
+
+        .disabled {
+            svg {
+                fill: $disabled-btn;
+            }
+        }
+    }
+
+    tr {
+        &:hover {
+            background: $primary-border-bottom-color;
+        }
+
+        &.active {
+            background: $primary-selected-item-color;
+
+            &:hover {
+                background: $primary-selected-item-color-hover;
+            }
+        }
+
+        &.Error td {
+            color: red;
+        }
+
+        &.Fatal td {
+            color: #c50101;
+        }
+
+        &.Warning td {
+            color: orange;
+        }
+
+        &.Debug td {
+            color: darkgray;
+        }
+
+        &.Verbose td {
+            color: #d1d1d1;
+        }
+
+        &.Information td {
+            color: black;
+        }
+    }
+}
+
+#table-template-wrapper {
+    padding: 2px;
+    display: -ms-flexbox;
+}
+
+.row-controllers .material-icons {
+    font-size: 25px !important;
+    font-weight: normal !important;
+    color: rgba(0, 0, 0, 1);
+    overflow: hidden;
+
+    &.inactive {
+        color: rgba(0, 0, 0, 0.2);
+        cursor: default;
+    }
+
+    &.green {
+        color: green;
+        cursor: pointer;
+    }
+
+    &.red {
+        color: red;
+        cursor: pointer;
+    }
+
+}
+
+.controllers {
+    min-width: 110px;
+    max-width: 170px;
+    line-height: 5px;
+}
+
+.hide {
+    display: none !important;
+}
+
+
+@media screen and (max-width: 500px) {
+    .row-controllers.controllers.ng-star-inserted {
+        display: initial;
+    }
+
+    .row-controllers .material-icons,
+    .row-controllers i {
+        font-size: 38px !important;
+        margin: 15px 10px 0;
+    }
+}

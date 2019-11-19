@@ -1,0 +1,42 @@
+<section id="data-table-wrapper">
+  <section id="data-table-container" *ngIf="!!dataSource && dataSource.data.length > 0">
+
+    <ak-table-paginator id="top-pagination"
+      *ngIf="(isServerPagging | async) && dataSource.data.length > 25 && pagginationDetails"
+      [pagginationData]="pagginationDetails" (changeItemsPerPage)="changeItemsPerPage($event)"
+      (goToPage)="goToPage($event)">
+    </ak-table-paginator>
+
+
+
+    <ak-large-table class="large-table" id="ak-large-table" *ngIf="displayLSize" [settings]="settings"
+      [properties]="properties" [dataSource]="dataSource" [displayedColumns]="displayedColumns"
+      (checkRow)="checkRow($event)" (sortingChanged)="sortingChanged($event)" (selectRowReq)="selectRow($event)"
+      (rowControlBTNs)="rowControlBTNs($event)" (inputDataChanged)="inputDataChanged($event)"
+      (selectAllRecordsReq)="selectAllRecords($event)">
+    </ak-large-table>
+
+    <ak-medium-table class="medium-table" id="ak-medium-table" *ngIf="displayMSize" [settings]="settings"
+      [properties]="properties" [dataSource]="dataSource" [displayedColumns]="displayedColumns"
+      (checkRow)="checkRow($event)" (sortingChanged)="sortingChanged($event)" (selectRowReq)="selectRow($event)"
+      (rowControlBTNs)="rowControlBTNs($event)" (inputDataChanged)="inputDataChanged($event)"
+      (selectAllRecordsReq)="selectAllRecords($event)">
+    </ak-medium-table>
+
+    <ak-small-table class="small-table" id="ak-small-table" *ngIf="displaySSize" [settings]="settings"
+      [properties]="properties" [dataSource]="dataSource" [displayedColumns]="displayedColumns"
+      (checkRow)="checkRow($event)" (sortingChanged)="sortingChanged($event)" (selectRowReq)="selectRow($event)"
+      (rowControlBTNs)="rowControlBTNs($event)" (inputDataChanged)="inputDataChanged($event)"
+      (selectAllRecordsReq)="selectAllRecords($event)">
+    </ak-small-table>
+
+
+
+    <ak-table-paginator id="bottom-pagination"
+      *ngIf="(isServerPagging | async) && (dataSource.data.length > 4 || currentPage > 1) && pagginationDetails"
+      [pagginationData]="pagginationDetails" (changeItemsPerPage)="changeItemsPerPage($event)"
+      (goToPage)="goToPage($event)">
+    </ak-table-paginator>
+
+  </section>
+</section>
