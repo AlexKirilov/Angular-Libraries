@@ -1,0 +1,52 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "baseUrl": "./",
+    "outDir": "./dist/out-tsc",
+    "sourceMap": true,
+    "declaration": false,
+    "downlevelIteration": true,
+    "experimentalDecorators": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "importHelpers": true,
+    "target": "es2015",
+    "typeRoots": [
+      "node_modules/@types"
+    ],
+    "lib": [
+      "es2018",
+      "dom"
+    ],
+    "paths": {
+      "message-handler": [
+        "dist/message-handler"
+      ],
+      "message-handler/*": [
+        "dist/message-handler/*"
+      ],
+      "generic-table": [
+        "dist/generic-table"
+      ],
+      "generic-table/*": [
+        "dist/generic-table/*"
+      ],
+      "table-column-customiser": [
+        "dist/table-column-customiser"
+      ],
+      "table-column-customiser/*": [
+        "dist/table-column-customiser/*"
+      ],
+      "fin-nested-tables": [
+        "dist/fin-nested-tables"
+      ],
+      "fin-nested-tables/*": [
+        "dist/fin-nested-tables/*"
+      ]
+    }
+  },
+  "angularCompilerOptions": {
+    "fullTemplateTypeCheck": true,
+    "strictInjectionParameters": true
+  }
+}
