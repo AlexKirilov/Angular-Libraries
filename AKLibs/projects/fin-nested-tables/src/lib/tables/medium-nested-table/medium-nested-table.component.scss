@@ -1,0 +1,38 @@
+#medium-nested-table {
+    width: 100%;
+
+    .mat-header-row {
+        background-color: #f6f6f6;
+
+        th {
+            border-right: none;
+
+            &.cdk-column-ctrls {
+                z-index: 2;
+            }
+
+            &.cdk-column-data1,
+            &.cdk-column-data2 {
+                background: transparent;
+            }
+        }
+    }
+}
+
+.medium-nested-detail-row {
+    width: 100%;
+    height: 0;
+}
+
+.activeSort {
+    z-index: 1;
+}
+
+.activeArrow {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.inactiveArrow {
+    font-size: 12px;
+}

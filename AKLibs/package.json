@@ -7,7 +7,11 @@
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+
+    "build:nested-table": "ng build fin-nested-tables && npm run copyNTablesScss",
+    "copyNTablesScss": "xcopy projects\\fin-nested-tables\\src\\lib\\fin-nested-tables-global.scss dist\\fin-nested-tables\\"
+
   },
   "private": true,
   "dependencies": {

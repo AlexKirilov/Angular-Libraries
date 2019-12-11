@@ -1,0 +1,263 @@
+
+
+/// Delete me
+.nested-table {
+
+    &.withTable {
+        overflow-x: auto;
+        box-shadow: 0 5px 5px -3px rgba(0, 0, 0, .2), 0 8px 10px 1px rgba(0, 0, 0, .14), 0 3px 14px 2px rgba(0, 0, 0, .12);
+    }
+
+    ////////////////////////////////////
+    //////// Table Cells Common
+
+    //// First Columns in table
+    td.mat-cell:first-of-type,
+    td.mat-footer-cell:first-of-type,
+    th.mat-header-cell:first-of-type {
+        padding-left: 10px;
+
+        &.cdk-column-expand,
+        &.cdk-column-selected {
+            padding-left: 0px;
+        }
+    }
+
+    .cdk-column-expand,
+    .cdk-column-selected {
+        max-width: 40px;
+        min-width: 40px;
+        text-align: center;
+
+        .mat-sort-header-container {
+            margin: 0 auto;
+            width: fit-content;
+        }
+
+        .mat-sort-header-arrow {
+            display: none;
+        }
+    }
+
+    .cdk-column-expand {
+        // padding-left: 0px;
+        border-right: none;
+
+        .expand-icons-container {
+            cursor: pointer;
+        }
+    }
+
+    //// Last Columns in table
+    .cdk-column-ctrl {
+        padding: 0 10px;
+
+        mat-icon {
+            cursor: pointer;
+        }
+
+        .mat-sort-header-arrow {
+            display: none;
+        }
+    }
+
+    td.mat-cell:last-of-type,
+    td.mat-footer-cell:last-of-type,
+    th.mat-header-cell:last-of-type {
+        padding-right: 10px;
+    }
+
+    // Details
+    td.large-nested-detail-nested-row-td:not(.hideBorder) {
+        padding: 10px 10px 15px;
+    }
+
+    .cdk-column-expandedDetail.details-expanded .large-nested-details-container {
+        box-shadow: 0 5px 5px -3px rgba(0, 0, 0, .2), 0 8px 10px 1px rgba(0, 0, 0, .14), 0 3px 14px 2px rgba(0, 0, 0, .12);
+    }
+
+
+    ////////////////////
+    /// Input Cells
+
+    .cdk-column-warning {
+        min-width: 35px;
+        text-align: center;
+        font-weight: bold;
+        color: red;
+
+        .mat-sort-header-container {
+            margin: 0 auto;
+            width: fit-content;
+
+            .mat-sort-header-button {
+                p {
+                    margin: 0;
+                    text-align: right;
+                }
+            }
+        }
+
+        .mat-sort-header-arrow {
+            display: none;
+        }
+    }
+
+    .td-inputFields {
+        position: relative;
+        top: 5px;
+        width: 90%;
+        margin: 0 auto;
+
+        .mat-form-field {
+            height: 35px;
+
+            .mat-form-field-infix {
+                background: #f0f8ff;
+                margin-top: 7px;
+                width: auto;
+            }
+
+            .mat-form-field-flex {
+                text-align: right;
+            }
+        }
+    }
+
+    ////////////////////////////////////
+    //////// Table Cells Remaining
+    ////////////////////////////////////
+
+
+    ////////////////////////////////////
+    /// Holdings Columns Layer 1
+    .cdk-column-security {
+        min-width: 200px;
+        max-width: 400px;
+
+        .txt-column-security {
+            max-width: 100%;
+            display: inline-block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            vertical-align: bottom;
+        }
+    }
+
+    .cdk-column-sedol {
+        min-width: 70px;
+        max-width: min-content;
+    }
+
+    .cdk-column-isin {
+        min-width: 110px;
+        max-width: 120px;
+    }
+
+    .cdk-column-isin {
+        min-width: 110px;
+    }
+
+    .cdk-column-imsSecRef {
+        min-width: 70px;
+        max-width: min-content;
+    }
+
+    .cdk-column-shares {
+        width: 57px;
+    }
+
+    .cdk-column-expense {
+        min-width: 60px;
+        max-width: min-content;
+    }
+
+    .cdk-column-indexation {
+        min-width: 75px;
+        max-width: min-content;
+    }
+
+    .cdk-column-marketValue {
+        min-width: 90px;
+        max-width: min-content;
+    }
+
+    .cdk-column-price {
+        min-width: 46px;
+        max-width: min-content;
+    }
+
+    .cdk-column-gainPrc {
+        min-width: 80px;
+        max-width: fit-content;
+    }
+
+    .cdk-column-prcHdg {
+        min-width: 70px;
+        max-width: fit-content;
+    }
+
+    .cdk-column-disposal {
+        min-width: 110px;
+        max-width: fit-content;
+    }
+
+    .cdk-column-proceeds {
+        min-width: 125px;
+        max-width: fit-content;
+    }
+
+    .cdk-column-proceeds {
+        min-width: 125px;
+        max-width: fit-content;
+    }
+
+    .cdk-column-dspExp {
+        min-width: 70px;
+        max-width: fit-content;
+    }
+
+    .cdk-column-dspIdx {
+        min-width: 70px;
+        max-width: fit-content;
+    }
+
+    .cdk-column-lostIdx {
+        min-width: 70px;
+        max-width: fit-content;
+    }
+
+    .cdk-column-gainLoss {
+        min-width: 100px;
+        max-width: fit-content;
+    }
+
+    .cdk-column-chargeableGain {
+        min-width: 107px;
+        max-width: fit-content;
+    }
+
+    ////////////////////////////////////
+    /// Holdings Columns Layer 2
+
+    .cdk-column-identification {
+        min-width: 200px;
+        max-width: 500px;
+    }
+
+    .cdk-column-acqDate {
+        min-width: 120px;
+        max-width: min-content;
+    }
+
+
+    /////////////////////////////
+    // Medium Table
+
+    .cdk-column-ctrls {
+        min-width: 30px;
+        max-width: 30px;
+    }
+
+}

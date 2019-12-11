@@ -1,0 +1,41 @@
+#small-nested-table {
+    width: 100%;
+
+    .mat-header-row {
+        background-color: #f6f6f6;
+
+        th {
+            border-right: none;
+
+            &.cdk-column-ctrls {
+                z-index: 2;
+            }
+
+            &.cdk-column-data1,
+            &.cdk-column-data2 {
+                background: transparent;
+            }
+        }
+    }
+}
+
+.small-nested-detail-row {
+    width: 100%;
+    height: 0;
+}
+
+.activeSort {
+    // color: #2195F2 !important;
+    z-index: 1;
+}
+
+.activeArrow {
+    // color: #2195F2 !important;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.inactiveArrow {
+    // color: black !important;
+    font-size: 12px;
+}

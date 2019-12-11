@@ -1,0 +1,29 @@
+<div
+    *ngIf="currencyType == 'combine' || currencyType == 'inRow'"
+    class="txt-column-{{col}}"
+>
+    <span *ngIf="num < 0 && indicator == 'minus'">
+        {{ (num) || 0 | currency: currency  :'symbol':'1.2-2'}}
+    </span>
+
+    <span *ngIf="num < 0 && indicator == 'brackets'">
+        ({{ (num * -1) || 0 | currency: currency  :'symbol':'1.2-2'}})
+    </span>
+
+    <span *ngIf="num >= 0">
+        {{ num || 0 | currency: currency  :'symbol':'1.2-2'}}
+    </span>
+</div>
+
+<div
+    *ngIf="currencyType == 'inHeader' || currencyType == null "
+    class="txt-column-{{col}}"
+>
+    <span *ngIf="num < 0 && indicator == 'minus'">{{ (num) || 0 | number :'1.2-2'}}</span>
+
+    <span *ngIf="num < 0 && indicator == 'brackets'">
+        ({{ (num * -1) || 0 | number :'1.2-2'}})
+    </span>
+
+    <span *ngIf="num >= 0">{{ num || 0 | number :'1.2-2'}}</span>
+</div>

@@ -1,0 +1,104 @@
+<section
+    class="nested-table"
+    id="nested-table-{{NTDetails?.tableName}}"
+    [class.withTable]="NTData && NTData?.dataSource.length"
+>
+    <section
+        class="nested-table-container"
+        *ngIf="NTData && NTData?.dataSource.length; else noTableData"
+    >
+
+        <section
+            id="nested-table-customisation"
+            *ngIf="NTSettings.customizable && layer === 1"
+            fxLayout="row"
+            fxLayoutAlign="center center"
+            (click)="triggerCustomization()"
+            [ngClass]="{ 'displayLSize': displayLSize, 'displayMSize': displayMSize, 'displaySSize' : displaySSize }"
+        >
+            <i class="material-icons">post_add</i>
+        </section>
+
+        <ak-pagination-menu
+            id="top-table-paggination"
+            class="ak-pagination-menu pag-layer-{{ layer }}"
+            *ngIf="NTSettings.isServerSide && NTData && NTData.dataSource && NTData.dataSource.length >= 50"
+            [isServerSide]="NTSettings?.isServerSide"
+            [pagginationDetails]="NTData?.details"
+            (changeItemsPerPage)="changeItemsPerPage($event, layer)"
+            (goToPage)="goToPage($event)"
+        >
+        </ak-pagination-menu>
+
+        <ak-large-nested-table
+            id="large-nested-table-layer-{{ layer }}"
+            *ngIf="displayLSize"
+            class="large-nested-table table-layer-{{ layer }}"
+            [NTData]="NTData"
+            [NTDetails]="NTDetails"
+            [NTSettings]="NTSettings"
+            [NTProperties]="NTProperties"
+            [layerLevel]="(layer)"
+            (updateTableRowDataReq)="updateTableRowDataReq($event)"
+            (selectDeselectAllReq)="selectDeselectAllReq($event)"
+            (expandCollapsAllReq)="expandCollapsAllReq($event)"
+            (changeInputDataReq)="changeInputDataReq($event)"
+            (tableCTRLBTNRowReq)="tableCTRLBTNRowReq($event)"
+            (sortColumnBy)="sortColumn($event)"
+        >
+        </ak-large-nested-table>
+
+        <ak-medium-nested-table
+            id="medium-nested-table-layer-{{ layer }}"
+            *ngIf="displayMSize"
+            class="medium-nested-table table-layer-{{ layer }}"
+            [NTData]="NTData"
+            [NTDetails]="NTDetails"
+            [NTSettings]="NTSettings"
+            [NTProperties]="NTProperties"
+            [layerLevel]="(layer)"
+            (updateTableRowDataReq)="updateTableRowDataReq($event)"
+            (selectDeselectAllReq)="selectDeselectAllReq($event)"
+            (expandCollapsAllReq)="expandCollapsAllReq($event)"
+            (changeInputDataReq)="changeInputDataReq($event)"
+            (tableCTRLBTNRowReq)="tableCTRLBTNRowReq($event)"
+            (sortColumnBy)="sortColumn($event)"
+        >
+        </ak-medium-nested-table>
+
+        <ak-small-nested-table
+            id="small-nested-table-layer-{{ layer }}"
+            *ngIf="displaySSize"
+            class="small-nested-table table-layer-{{ layer }}"
+            [NTData]="NTData"
+            [NTDetails]="NTDetails"
+            [NTSettings]="NTSettings"
+            [NTProperties]="NTProperties"
+            [layerLevel]="(layer)"
+            (updateTableRowDataReq)="updateTableRowDataReq($event)"
+            (selectDeselectAllReq)="selectDeselectAllReq($event)"
+            (expandCollapsAllReq)="expandCollapsAllReq($event)"
+            (changeInputDataReq)="changeInputDataReq($event)"
+            (tableCTRLBTNRowReq)="tableCTRLBTNRowReq($event)"
+            (sortColumnBy)="sortColumn($event)"
+        >
+        </ak-small-nested-table>
+
+        <ak-pagination-menu
+            id="bottom-table-paggination"
+            class="ak-pagination-menu  pag-layer-{{ layer }}"
+            *ngIf="NTSettings.isServerSide && NTData && NTData.dataSource && (NTData.dataSource.length >= 5 || NTData.details.pageCount > 1)"
+            [isServerSide]="NTSettings.isServerSide"
+            [pagginationDetails]="NTData.details"
+            (changeItemsPerPage)="changeItemsPerPage($event, layer)"
+            (goToPage)="goToPage($event)"
+        >
+        </ak-pagination-menu>
+
+    </section>
+
+    <ng-template #noTableData>
+        <section id="noTableData">{{ NTSettings?.noDataMSG }}</section>
+    </ng-template>
+
+</section>

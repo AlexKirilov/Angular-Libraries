@@ -1,0 +1,70 @@
+<section id="generic-table-exp-wrapper" fxLayout="column" fxLayoutAlign="center stretch" fxLayoutGap="50px">
+
+    <section id="top-g-table-controls" fxLayout="row wrap" fxLayoutAlign="space-between center">
+  
+      <div id="change-table-type-req">
+        <b style="position: relative; top: -3px; left: -3px;">Client Side </b>
+        <mat-slide-toggle [checked]="isServerPagging" (change)="toggleDataLoad(!isServerPagging)"><b>Server Side</b>
+        </mat-slide-toggle>
+      </div>
+  
+      <mat-form-field>
+        <mat-select [(ngModel)]="currencyType" (selectionChange)='changeCurrencyType($event.value)'>
+          <mat-option value>--</mat-option>
+          <mat-option value="inHeader">In Header</mat-option>
+          <mat-option value="inRow">In Row</mat-option>
+          <mat-option value="combine">Combined</mat-option>
+        </mat-select>
+      </mat-form-field>
+  
+      <mat-form-field>
+        <mat-select [(ngModel)]="currencyIndicator" (selectionChange)='changeCurrencyIndicator($event.value)'>
+          <mat-option value>--</mat-option>
+          <mat-option value="minus">with Minus</mat-option>
+          <mat-option value="brackets">with Brackets</mat-option>
+        </mat-select>
+      </mat-form-field>
+  
+      <mat-form-field>
+        <mat-select [(ngModel)]="tCurrency" (selectionChange)='updateCurrency($event.value)'>
+          <mat-option value="GBP">GBP</mat-option>
+          <mat-option value="USD">USD</mat-option>
+          <mat-option value="BGN">BGN</mat-option>
+        </mat-select>
+      </mat-form-field>
+  
+  
+      <div id="change-date-type-display">
+        <b style="position: relative; top: -3px; left: -3px;">Short Date</b>
+        <mat-slide-toggle [checked]="isFullDate" (change)="toggleDateType(!isFullDate)"><b>Full Date</b>
+        </mat-slide-toggle>
+      </div>
+  
+      <div id="change-date-type-display">
+          <b style="position: relative; top: -3px; left: -3px;">Default</b>
+          <mat-slide-toggle [checked]="isCustomisable" (change)="toggleCustomisable(!isCustomisable)"><b>Customisable</b>
+          </mat-slide-toggle>
+        </div>
+    </section>
+  
+    <ak-fin-nested-tables fxLayout="row" fxLayoutAlign="space-around stretch"
+     [NTData]="tableData | async"
+     [NTDetails]="tDetails | async"
+     [NTSettings]="tSettings | async"
+     [NTProperties]="tProperties | async"
+  
+     (tableCustomization)="tableCustomization($event)"
+     (updateTableRowData)="updateTableRowData($event)"
+     (getServerPageData)="getServerPageData($event)"
+     (selectDeselectAll)="selectDeselectAll($event)"
+     (expandCollapsAll)="expandCollapsAll($event)"
+     (changeInputData)="changeInputData($event)"
+     (tableCTRLBTNRow)="tableCTRLBTNRow($event)"
+     (sortColumnBy)="sortingChanged($event)"
+     (OnError)="OnTableError($event)"
+    >
+  </ak-fin-nested-tables>
+  
+  
+  </section>
+  

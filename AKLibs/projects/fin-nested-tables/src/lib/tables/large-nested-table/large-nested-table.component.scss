@@ -1,0 +1,21 @@
+.large-nested-detail-row {
+    width: 100%;
+    height: 0;
+}
+
+.large-nested-details-container {
+    overflow: hidden;
+    display: flex;
+}
+
+table,
+.inner-table {
+    width: 100%;
+}
+
+
+p {
+    margin: 0;
+    padding: 0;
+    text-align: right;
+}

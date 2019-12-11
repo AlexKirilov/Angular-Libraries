@@ -1,0 +1,186 @@
+/* You can add global styles to this file, and also import other style files */
+
+@import "~@angular/material/prebuilt-themes/deeppurple-amber.css";
+
+@import "../../fin-nested-tables/src/lib/fin-nested-tables-global.scss";
+@import "../../fin-nested-tables/src/lib/additinal.scss";
+/* You can add global styles to this file, and also import other style files */
+/* @import '@angular/material/prebuilt-themes/deeppurple-amber.css';
+
+@import '../../message-handler/src/lib/message-handler-style.scss';
+// @import "~@angular-fsl/message-handler/message-handler-style.scss";
+
+@import '../../generic-tables/src/lib/generic-table-global-style.scss';
+// @import "~@angular-fsl/generic-tables/generic-table-global-style.scss";
+
+@import '../../nested-tables/src/lib/nested-tables-style.scss';
+@import '../../nested-tables/src/lib/fsl-nested-tables-styles.scss';
+// @import "~@angular-fsl/fin-nested-tables/nested-tables-style.scss";
+// @import "~@angular-fsl/fin-nested-tables/fsl-nested-tables-styles.scss";
+
+@import '../../table-column-customisation/src/lib/table-column-control.scss';
+// @import "~@angular-fsl/table-column-customisation/table-column-control.scss"; */
+
+html,
+body {
+    height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+}
+
+mat-toolbar {
+    // background: #1976D2 !important;
+
+    mat-ink-bar {
+        box-shadow: 0 -3px 5px #fafafa;
+        background: transparent !important;
+    }
+
+    .mat-tab-header,
+    .mat-tab-nav-bar {
+        border-color: transparent !important;
+    }
+
+    a {
+        color: #fff !important;
+        font-weight: 700;
+        opacity: .8;
+    }
+
+    .mat-tab-label-active {
+        background: rgba(255, 255, 255, .1);
+    }
+}
+
+
+//////////////////////////
+//// Generic Table
+.cdk-column-security {
+    max-width: 250px;
+
+    span {
+        max-width: 100%;
+        display: inline-block;
+        white-space: nowrap;
+        overflow: hidden !important;
+        text-overflow: ellipsis;
+        vertical-align: bottom;
+    }
+}
+
+
+mat-drawer-container {
+    width: 100%;
+    min-height: 82.5vh;
+}
+
+.mat-drawer {
+    background: #1976D2;
+}
+
+//// END
+//////////////////////////////////////
+
+
+//////////////////////////
+//// Nested Table
+app-nested-table {
+    margin-bottom: 50px;
+
+    &::-webkit-scrollbar {
+        -webkit-appearance: none;
+        width: 10px !important;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        border-radius: 4px;
+        background-color: rgba(0, 0, 0, .5);
+        box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+        -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+    }
+
+    &::-webkit-scrollbar-corner {
+        background: transparent;
+    }
+
+    .nested-table tr {
+        th {
+            .mat-sort-header-container {
+                flex-direction: row;
+                box-sizing: border-box;
+                display: flex;
+                place-content: center flex-end;
+                align-items: center;
+            }
+
+            &.cdk-column-security,
+            &.cdk-column-sedol,
+            &.cdk-column-isin,
+            &.cdk-column-imsSecRef,
+            &.cdk-column-identification {
+                .mat-sort-header-container {
+                    flex-direction: row;
+                    box-sizing: border-box;
+                    display: flex;
+                    place-content: center flex-start;
+                    align-items: center;
+                }
+            }
+        }
+
+        td {
+
+            &.cdk-column-security,
+            &.cdk-column-sedol,
+            &.cdk-column-isin,
+            &.cdk-column-imsSecRef,
+            &.cdk-column-identification {
+                text-align: left !important;
+            }
+
+
+        }
+    }
+
+    .vs {
+        width: auto !important;
+        min-width: 30px;
+
+        div,
+        span {
+            margin: auto 0;
+        }
+    }
+
+
+    .input {
+        max-width: 200px !important;
+    }
+
+}
+
+.activeSort {
+    color: #2195F2 !important;
+}
+
+.activeArrow {
+    color: #2195F2 !important;
+}
+
+.inactiveArrow {
+    color: black !important;
+}
+
+.hide {
+    display: none !important;
+}
+
+.hideBorder {
+    border: none !important;
+}
+
+//// END
+//////////////////////////////////////

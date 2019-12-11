@@ -1,0 +1,15 @@
+.nested-table {
+    width: 100%;
+    height: 100%;
+
+    .nested-table-container {
+        width: fit-content;
+        min-width: 100%;
+        height: 100%;
+
+        #top-table-paggination,
+        #bottom-table-paggination {
+            background: white;
+        }
+    }
+}

@@ -1,0 +1,438 @@
+<div class="mat-elevation-z8">
+    <!-- Medium Table -->
+    <table
+        mat-table
+        id="medium-nested-table"
+        [dataSource]="dataSource"
+        matSortDisableClear
+        multiTemplateDataRows
+    >
+
+        <ng-container
+            *ngFor="let columns of mediumTableColumn; let i = index"
+            matColumnDef="{{columns}}"
+        >
+
+            <!-- Header -->
+            <th
+                mat-header-cell
+                *matHeaderCellDef
+                id="nt-th-{{mediumTableColumn[i]}}"
+                class="table-cell-th"
+            >
+                <div
+                    *ngIf="i === 0 && dataSource.data.length > 2"
+                    class="leftSide"
+                    fxLayout="row"
+                    fxLayoutAlign="start center"
+                >
+
+                    <!-- Expand Details -->
+                    <button
+                        mat-icon-button
+                        id="viewEditContlBTN"
+                        (click)="toggleDetailsTable()"
+                    >
+                        <mat-icon
+                            class="iconSizeSet iconColorSet"
+                            *ngIf="NTSettings.allExpanded"
+                        >
+                            unfold_less
+                        </mat-icon>
+                        <mat-icon
+                            class="iconSizeSet iconColorSet"
+                            *ngIf="!NTSettings.allExpanded"
+                        >
+                            unfold_more
+                        </mat-icon>
+                    </button>
+
+                    <!-- Select/Deselect All -->
+                    <div
+                        *ngIf="isSelected"
+                        id="selecDeselectAll"
+                    >
+                        <mat-checkbox
+                            id="cb-select-all"
+                            [(ngModel)]="NTSettings.cbSelectAll"
+                            [checked]="NTSettings.cbSelectAll"
+                            (change)="selectAll($event)"
+                            (click)="$event.stopPropagation()"
+                        >
+                        </mat-checkbox>
+                    </div>
+
+                    <!-- Sorting Icon -->
+                    <div
+                        class="icon-txt-container"
+                        style="margin: auto 20px"
+                        fxLayout="column"
+                        fxLayoutAlign="center center"
+                    >
+                        <ng-container *ngTemplateOutlet="sortingIcon"></ng-container>
+                    </div>
+
+                    <!-- Currency -->
+                    <div class="currency-display">Currency: ({{ NTDetails.currency }})</div>
+                </div>
+            </th>
+
+            <!-- Table Cells -->
+            <td
+                mat-cell
+                *matCellDef="let row"
+                id="nt-td-{{NTProperties.tableColumnNames[columns]}}"
+                class="table-cell-td"
+            >
+
+                <section
+                    id="control-data-container"
+                    *ngIf="columns === 'ctrls' "
+                    fxLayout="column"
+                    fxLayoutAlign="center center"
+                    fxLayoutGap="25px"
+                >
+
+                    <!-- CheckBox column -->
+                    <div
+                        *ngIf="tableColumnNames.ctrls.includes('selected')"
+                        id="nt-row-cb-{{row[NTDetails?.rowIDName[layerLevel - 1]]}}"
+                    >
+                        <mat-checkbox
+                            id="nt-ch-{{row[NTDetails?.rowIDName[layerLevel - 1]]}}"
+                            [checked]="row['selected']"
+                            (change)="selectTableRow(row)"
+                            (click)="$event.stopPropagation()"
+                        >
+                        </mat-checkbox>
+                    </div>
+
+                    <!-- Expand Details Column -->
+                    <div
+                        class="columnCenter"
+                        id="nt-row-arrow-{{row[NTDetails?.rowIDName[layerLevel - 1]]}}"
+                        *ngIf="tableColumnNames.ctrls.includes('expand')"
+                    >
+                        <div
+                            class="expand-icons-container"
+                            *ngIf="row[NTDetails?.nestedPropertyName[layerLevel - 1]]"
+                            (click)="expandDetails(row)"
+                            onclick="event.stopPropagation();"
+                        >
+                            <span
+                                class="expand-icon"
+                                [class.hide]="row?.expanded"
+                            >
+                                ▼
+                            </span>
+                            <span
+                                class="expand-icon"
+                                [class.hide]="!row?.expanded"
+                            >
+                                ▲
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Cell Control Buttons -->
+                    <ak-table-control-btns
+                        [row]="row"
+                        [editableRowId]="editableRowId"
+                        [rowIDName]="NTDetails?.rowIDName[layerLevel - 1]"
+                        (editRowReq)="editRecord($event)"
+                        (saveRowReq)="saveRecord($event)"
+                        (removeRowReq)="removeRecord($event)"
+                    >
+                    </ak-table-control-btns>
+
+                </section>
+
+                <ul *ngIf="columns !== 'ctrls' ">
+                    <li
+                        *ngFor="let col of tableColumnNames[columns]"
+                        id="{{col}}"
+                        fxLayout="row"
+                        fxLayoutAlign="start center"
+                        fxLayoutGap="10px"
+                    >
+
+                        <div class="column-title">{{ col }}:</div>
+
+                        <div
+                            class="column-text txt-column-{{col}}"
+                            [ngSwitch]="columnType(col)"
+                        >
+                            <!-- Input Field Column -->
+                            <div
+                                *ngSwitchCase="'inputs'"
+                                id="td-input-{{row[NTDetails?.rowIDName[layerLevel - 1]]}}"
+                                class="td-inputFields inputs-cell"
+                                fxLayout="row"
+                                fxLayoutAlign="center center"
+                            >
+                                <mat-form-field
+                                    class="nested-input"
+                                    fxLayout="row"
+                                    fxLayoutAlign="center center"
+                                >
+                                    <input
+                                        matInput
+                                        type="number"
+                                        [(ngModel)]="row[col]"
+                                        (change)="changeInputData(row, col)"
+                                        onclick="event.stopPropagation();"
+                                        id="input-{{col}}"
+                                    >
+                                </mat-form-field>
+                            </div>
+
+                            <!-- Numeric Column -->
+                            <ak-numeric-with-currency-cell
+                                *ngSwitchCase="'numeric'"
+                                [num]="row[col]"
+                                [col]="col"
+                                [currencyType]="NTSettings?.currencyType"
+                                [indicator]="NTSettings?.indicator"
+                                [currency]="NTDetails?.currency"
+                                class="numeric-cell"
+                            >
+                            </ak-numeric-with-currency-cell>
+
+                            <!-- Date column -->
+                            <ak-date-cells
+                                *ngSwitchCase="'dates'"
+                                [isFullDate]="NTSettings.fullDate"
+                                [colName]="col"
+                                [cellId]="row[NTDetails?.rowIDName[layerLevel - 1]]"
+                                [date]="row[col]"
+                                class="dates-cell"
+                            >
+                            </ak-date-cells>
+
+                            <!-- Text with dots and ToolTip -->
+                            <div
+                                *ngSwitchCase="'toolTips'"
+                                class="tooltip-cell tooltip-{{col}}"
+                                id="toolTip-{{col}}-{{row[NTDetails?.rowIDName[layerLevel - 1]]}}"
+                                [class.recalculate]="row.clientRecalculation"
+                            >
+                                <!-- [matTooltip]="row[col]" matTooltipPosition="above" -->
+                                {{row[col]}}
+                            </div>
+
+                            <!-- Percentage Column -->
+                            <div
+                                *ngSwitchCase="'prc'"
+                                class="percentage-cell percentage-{{col}}"
+                            >
+                                {{ row[col] || (0 | number :'1.2-2')}} {{ !row[col] ? '%' : ''}}
+                            </div>
+
+                            <!-- All Remaining columns -->
+                            <div
+                                *ngSwitchDefault
+                                class="remaining-cell txt-column-{{col}}"
+                                id="row-{{col}}-span-{{row[NTDetails?.rowIDName[layerLevel - 1]]}}"
+                            >
+                                {{row[col]}}
+                            </div>
+                        </div>
+
+                    </li>
+                </ul>
+            </td>
+        </ng-container>
+
+        <!-- Nested Table Columns -->
+        <ng-container matColumnDef="expandedDetail">
+            <td
+                mat-cell
+                *matCellDef="let element"
+                [attr.colspan]="NTProperties?.displayedColumns[layerLevel - 1].length"
+                [class.hideBorder]="!element[NTDetails?.nestedPropertyName[layerLevel]] && !element.expanded"
+                [class.details-expanded]="element.expanded"
+                class="medium-nested-detail-nested-row-td"
+            >
+                <div
+                    class="medium-nested-details-container"
+                    *ngIf="element[NTDetails?.nestedPropertyName[layerLevel - 1]]"
+                >
+                    <div
+                        class="inner-table mat-elevation-z8"
+                        *ngIf="element.expanded"
+                    >
+
+                        <ak-medium-nested-table
+                            class="rows inner-details"
+                            id="medium-nested-table-layer-{{ layerLevel }}"
+                            [NTData]="sendDataToNextLayer(element[NTDetails?.nestedPropertyName[layerLevel - 1]])"
+                            [NTDetails]="NTDetails"
+                            [NTSettings]="NTSettings"
+                            [NTProperties]="NTProperties"
+                            [layerLevel]="layerLevel + 1"
+                        >
+                        </ak-medium-nested-table>
+
+                    </div>
+                </div>
+            </td>
+        </ng-container>
+
+        <tbody>
+            <tr
+                mat-header-row
+                *matHeaderRowDef="mediumTableColumn"
+            ></tr>
+            <tr
+                mat-row
+                *matRowDef="let row; columns: mediumTableColumn; let i = index"
+                class="{{row?.level}}"
+                [id]=" 'row-' + row[NTDetails?.rowIDName[layerLevel - 1]]"
+            >
+            </tr>
+            <tr
+                mat-row
+                *matRowDef="let nestedRow; columns: ['expandedDetail']"
+                class="medium-nested-detail-row"
+            ></tr>
+
+        </tbody>
+    </table>
+
+    <mat-paginator
+        [pageSizeOptions]="[5, 10, 25, 50, 100]"
+        showFirstLastButtons
+        [class.hide]="NTSettings.isServerSide"
+        fxLayout="row"
+        fxLayoutAlign="start center"
+    >
+    </mat-paginator>
+</div>
+
+<ng-template #sortingIcon>
+
+    <button
+        matSuffix
+        mat-icon-button
+        [matMenuTriggerFor]="searchTypeMenu"
+        id="sort-by-column-btn"
+        fxLayout="row"
+        fxLayoutAlign="center center"
+    >
+        <!-- Ascending -->
+        <div
+            *ngIf="sortDirection == 1"
+            class="sorting-sm-md-icon"
+            fxLayout="row"
+            fxLayoutAlign="center center"
+        >
+            <mat-icon
+                id="dragIndicator-svg-icon"
+                matTooltip="Sort By"
+                matTooltipPosition="above"
+            >
+                <svg
+                    aria-hidden="true"
+                    focusable="false"
+                    data-prefix="fas"
+                    data-icon="sort-amount-up-alt"
+                    class="svg-inline--fa fa-sort-amount-up-alt fa-w-16"
+                    role="img"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 512 512"
+                >
+                    <path
+                        fill="currentColor"
+                        d="M240 96h64a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16h-64a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16zm0 128h128a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16H240a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16zm256 192H240a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h256a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm-256-64h192a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16H240a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16zM16 160h48v304a16 16 0 0 0 16 16h32a16 16 0 0 0 16-16V160h48c14.21 0 21.39-17.24 11.31-27.31l-80-96a16 16 0 0 0-22.62 0l-80 96C-5.35 142.74 1.78 160 16 160z"
+                    >
+                    </path>
+                </svg>
+            </mat-icon>
+        </div>
+
+        <!-- Decending -->
+        <div
+            *ngIf="sortDirection === -1"
+            class="sorting-sm-md-icon"
+            fxLayout="row"
+            fxLayoutAlign="center center"
+        >
+            <mat-icon
+                id="dragIndicator-svg-icon"
+                matTooltip="Sort By"
+                matTooltipPosition="above"
+            >
+                <svg
+                    aria-hidden="true"
+                    focusable="false"
+                    data-prefix="fas"
+                    data-icon="sort-amount-down"
+                    class="svg-inline--fa fa-sort-amount-down fa-w-16"
+                    role="img"
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 512 512"
+                >
+                    <path
+                        fill="currentColor"
+                        d="M304 416h-64a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h64a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm-128-64h-48V48a16 16 0 0 0-16-16H80a16 16 0 0 0-16 16v304H16c-14.19 0-21.37 17.24-11.29 27.31l80 96a16 16 0 0 0 22.62 0l80-96C197.35 369.26 190.22 352 176 352zm256-192H240a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h192a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zm-64 128H240a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h128a16 16 0 0 0 16-16v-32a16 16 0 0 0-16-16zM496 32H240a16 16 0 0 0-16 16v32a16 16 0 0 0 16 16h256a16 16 0 0 0 16-16V48a16 16 0 0 0-16-16z"
+                    >
+                    </path>
+                </svg>
+            </mat-icon>
+        </div>
+    </button>
+
+    <mat-menu #searchTypeMenu="matMenu">
+        <button
+            mat-menu-item
+            *ngFor="let sort of sortBy"
+            value="{{sort}}"
+            class="drop-sortBy"
+            (click)="SortByColumn(sort)"
+            id="sortBy-{{sort}}"
+            [class.activeSort]="sort == sortColumn"
+            fxLayout="row"
+            fxLayoutAlign="start center"
+            fxLayoutGap="10px"
+        >
+
+            <span *ngIf="sort === sortColumn">
+                <!-- Reverst Arrows -->
+                <!-- Ascending -->
+                <i
+                    class="material-icons activeArrow"
+                    *ngIf="sortDirection == -1"
+                >
+                    arrow_upward
+                </i>
+
+                <!-- Decending -->
+                <i
+                    class="material-icons activeArrow"
+                    *ngIf="sortDirection == 1"
+                >
+                    arrow_downward
+                </i>
+            </span>
+            <span *ngIf="sort !== sortColumn">
+                <!-- Ascending -->
+                <i
+                    class="material-icons inactiveArrow"
+                    *ngIf="sortDirection == 1"
+                >
+                    arrow_upward
+                </i>
+
+                <!-- Decending -->
+                <i
+                    class="material-icons inactiveArrow"
+                    *ngIf="sortDirection == -1"
+                >
+                    arrow_downward
+                </i>
+            </span>
+
+            {{ originalColumnNames[sort] }}
+        </button>
+    </mat-menu>
+</ng-template>
