@@ -10,8 +10,11 @@
     "e2e": "ng e2e",
 
     "build:nested-table": "ng build fin-nested-tables && npm run copyNTablesScss",
-    "copyNTablesScss": "xcopy projects\\fin-nested-tables\\src\\lib\\fin-nested-tables-global.scss dist\\fin-nested-tables\\"
-
+    "copyNTablesScss": "xcopy projects\\fin-nested-tables\\src\\lib\\fin-nested-tables-global.scss dist\\fin-nested-tables\\",
+    
+    "build:message-handler": "ng build message-handler && npm run copyMessHScss",
+    "copyMessHScss": "xcopy projects\\message-handler\\src\\lib\\message-handler-style.scss dist\\message-handler\\"
+    
   },
   "private": true,
   "dependencies": {

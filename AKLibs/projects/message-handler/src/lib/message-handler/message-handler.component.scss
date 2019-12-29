@@ -1,0 +1,120 @@
+$colorError: darkred;
+$colorInfo: #17A2C8;
+$colorPromp: black;
+$colorShortKeys: black;
+$colorStatus: darkorange;
+$colorWarning: rgb(238, 214, 2);
+$colorDebug: rgb(190, 190, 190);
+
+#error-modal-wrapper {
+    width: 100%;
+    min-width: 500px;
+    height: 100%;
+    display: inline-block;
+
+    #modaw-container {
+        margin: auto;
+        display: block;
+
+        .header {
+            .title {
+                text-transform: capitalize;
+            }
+
+            .icons {
+                width: 35px;
+                height: 35px;
+                float: left;
+                margin-right: 10px;
+                color: transparent;
+
+                i {
+                    font-size: 35px;
+                    width: 35px;
+                }
+
+                .error {
+                    color: $colorError;
+                }
+
+
+                .warning {
+                    color: $colorWarning
+                }
+
+                .info {
+                    color: $colorInfo;
+                }
+
+                .status {
+                    color: $colorStatus;
+                }
+
+                .debug {
+                    color: $colorDebug;
+                }
+
+                .prompt {
+                    color: $colorPromp;
+                }
+
+                .shortkeys {
+                    color: $colorShortKeys;
+                }
+            }
+        }
+
+        .body-container {
+            width: 90%;
+            margin: 20px auto;
+
+            #status-list {
+                padding: 0px;
+
+                li {
+                    text-decoration: none;
+                    overflow: hidden;
+                    font-size: 12px;
+
+                    &.success {
+                        color: green;
+                    }
+
+                    &.fail {
+                        color: red;
+                    }
+
+                    .file-status {
+                        font-weight: bold;
+                        float: right;
+                        text-transform: uppercase;
+                    }
+                }
+            }
+
+            #shortkeys-list {
+                padding: 0px;
+
+                li {
+                    text-decoration: none;
+                    overflow: hidden;
+
+                    .file-name {
+                        width: 150px;
+                        font-weight: bold;
+                    }
+                }
+            }
+        }
+
+        .controls {
+            width: 100%;
+
+            .control-btns {
+                width: auto;
+                display: block;
+                float: right;
+            }
+        }
+    }
+}

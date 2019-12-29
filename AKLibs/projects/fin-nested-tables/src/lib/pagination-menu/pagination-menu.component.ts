@@ -10,6 +10,7 @@ export class PaginationMenuComponent implements OnChanges {
 
   @Input() isServerSide = false;
   @Input() pagginationDetails: NTDetailsI = new Object() as NTDetailsI;
+  @Input() pageSizeOptions: Array<number>;
 
   @Output() changeItemsPerPage = new EventEmitter<number>();
   @Output() goToPage = new EventEmitter<number>();

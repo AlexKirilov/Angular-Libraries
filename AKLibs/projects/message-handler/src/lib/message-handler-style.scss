@@ -1,0 +1,33 @@
+
+mat-dialog-content {
+    margin: auto !important;
+}
+
+mat-dialog-actions {
+    margin-bottom: 0px !important;
+    margin-right: 20px;
+    padding: 0 !important;
+
+    button {
+        background: #1976D2 !important;
+    }
+}
+
+mat-dialog-container {
+    padding: 0 !important;
+    margin: 0 !important;
+
+    .mat-dialog-title {
+        padding: 10px 15px;
+        background: #1976D2;
+        color: white;
+
+        .close {
+            cursor: pointer;
+
+            &:hover {
+                color: orange;
+            }
+        }
+    }
+}

@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Observable } from 'rxjs/internal/Observable';
 import { of } from 'rxjs/internal/observable/of';
+import { take, map } from 'rxjs/operators';
 
 import { GetDataService } from '../../Data/get-data.service';
 
 import { NTDataI, NTDetails, NTSettingsI, NTPropertiesI } from 'projects/fin-nested-tables/src/public-api';
-import { take, map } from 'rxjs/operators';
 import { nestedTableColumns, TableColumnNames } from '../../Data/defaultTableSettings';
 import { ServerPagginationI } from 'fin-nested-tables/public-api';
 import { DatastoreService } from '../../services/datastore.service';
@@ -33,19 +33,17 @@ export class NestedTableComponent implements OnInit {
 
   isServerPagging: boolean = $isServerPaggingDef;
   currentPage = 1;
-  itemsPerPage = 25;
+  itemsPerPage = 10;
   sortColumnBy: string = $sortColumnByDef;
-  sortDirection: boolean = $sortDirectionDef;
+  sortDirection = 'desc'; //$sortDirectionDef;
 
   public currencyType: 'inHeader' | 'inRow' | 'combine' = null;
   public currencyIndicator: 'minus' | 'brackets' = 'minus';
   public isFullDate = false;
   public isCustomisable = false;
 
-  private page = 1;
-  private perPage = 15;
-  private sortName = '';
-  private direction = 'desc';
+  // private sortName = '';
+  // private direction = 'desc';
 
   constructor(
     private data: GetDataService,
@@ -61,10 +59,11 @@ export class NestedTableComponent implements OnInit {
   }
 
   onInitLoadData() {
-    this.getData(this.page, this.perPage, this.sortName, this.direction as 'asc' | 'desc');
+    this.getData(this.currentPage, this.itemsPerPage, this.sortColumnBy, this.sortDirection as 'asc' | 'desc');
   }
-  getData(page: number, perPage: number, sortName: string, direction: 'asc' | 'desc'): void {
-    this.tableData = this.data.getData(page, perPage, sortName, direction).pipe(take(1), map(res => res));
+  
+  async getData(page: number, perPage: number, sortName: string, direction: 'asc' | 'desc'): Promise<void> {
+    this.tableData = (await this.data.getData(page, perPage, sortName, direction, this.isServerPagging)).pipe(take(1), map(res => res));
   }
 
   setTableDefParams() {
@@ -81,11 +80,15 @@ export class NestedTableComponent implements OnInit {
     settings.isServerSide = this.isServerPagging;
     settings.indicator = this.currencyIndicator;
     settings.currencyType = this.currencyType;
+    settings.areDetailsServerSide = false;
     settings.allExpanded = false;
     settings.noDataMSG = 'No Data';
+    settings.isDataFilterVisible = false;
+    settings.pageSizeOptions = [5, 10, 15, 25, 50, 100, 150];
+
     this.tSettings = of(settings);
 
-    if (!this.isServerPagging) { this.onInitLoadData(); }
+    this.onInitLoadData();
   }
 
   setTableProperties(newColumns?: Array<string[]>) {
@@ -99,7 +102,7 @@ export class NestedTableComponent implements OnInit {
     properties.columnsWithToolTip = ['security'];
     properties.dateTransformNames = ['acqDate'];
     properties.numberCorrectionList = ['expense', 'indexation', 'gainLoss', 'chargeableGain', 'price'];
-    properties.stickyVerColumnsList = ['expand', 'selected'];
+    properties.stickyVerColumnsList = []; // 'expand', 'selected'
     properties.skipColumns = [];
 
     this.tProperties = of(properties);
@@ -110,7 +113,7 @@ export class NestedTableComponent implements OnInit {
     details.currency = this.tCurrency;
     details.tableName = 'WifClients';
     details.isNested = true;
-    details.rowIDName = ['securityRef'];
+    details.rowIDName = ['clientRef'];
     details.nestedPropertyName = ['assets'];
     this.tDetails = of(details);
   }
@@ -142,7 +145,7 @@ export class NestedTableComponent implements OnInit {
 
   sortingChanged($event: any) {
     this.sortColumnBy = $event.direction !== '' ? $event.active || $event.col : $sortColumnByDef;
-    this.sortDirection = $event.direction === 'asc' || $event.direction === '' ? false : true;
+    this.sortDirection = $event.direction; // $event.direction === 'asc' || $event.direction === '' ? false : true;
     this.onInitLoadData();
   }
 
@@ -205,6 +208,10 @@ export class NestedTableComponent implements OnInit {
 
   OnTableError($error: any): void {
     console.log('OnTableError', $error);
+  }
+
+  filterTableData($searchingWord: string): void {
+    console.log('Searching for ', $searchingWord);
   }
 
 }

@@ -1,71 +1,36 @@
 <div class="mat-elevation-z8">
+
+    <section class="ak-nested-data-filter" *ngIf="NTSettings?.isDataFilterVisible">
+        <mat-form-field>
+            <input matInput type="text" placeholder="Filter" [formControl]="filterCtrl">
+        </mat-form-field>
+    </section>
+
     <!-- Large Table -->
-    <table
-        mat-table
-        id="large-nested-table"
-        [dataSource]="dataSource"
-        matSort
-        (matSortChange)="sortData($event)"
-        matSortDisableClear
-        multiTemplateDataRows
-    >
+    <table mat-table id="large-nested-table" [dataSource]="dataSource" matSort (matSortChange)="sortData($event)"
+        matSortDisableClear multiTemplateDataRows>
 
         <!-- Expand Details Column -->
-        <ng-container
-            matColumnDef="expand"
-            sticky="{{isColSticky('expand')}}"
-        >
-            <th
-                mat-header-cell
-                *matHeaderCellDef
-                class="vs"
-                id="nt-th-expand"
-            >
-                <button
-                    mat-icon-button
-                    id="viewEditContlBTN"
-                    (click)="toggleDetailsTable()"
-                >
-                    <mat-icon
-                        class="iconSizeSet iconColorSet"
-                        *ngIf="NTSettings.allExpanded"
-                    >
+        <ng-container matColumnDef="expand" sticky="{{isColSticky('expand')}}">
+            <th mat-header-cell *matHeaderCellDef class="vs" id="nt-th-expand">
+                <button mat-icon-button id="viewEditContlBTN" (click)="toggleDetailsTable()" onclick="event.stopPropagation()">
+                    <mat-icon class="iconSizeSet iconColorSet" *ngIf="NTSettings.allExpanded">
                         unfold_less
                     </mat-icon>
-                    <mat-icon
-                        class="iconSizeSet iconColorSet"
-                        *ngIf="!NTSettings.allExpanded"
-                    >
+                    <mat-icon class="iconSizeSet iconColorSet" *ngIf="!NTSettings.allExpanded">
                         unfold_more
                     </mat-icon>
                 </button>
             </th>
-            <td
-                mat-cell
-                *matCellDef="let row"
-                class="vs"
-                id="nt-td-expand-{{row[NTDetails?.rowIDName[layerLevel - 1]]}}"
-            >
-                <div
-                    class="columnCenter"
-                    id="nt-row-arrow-{{row[NTDetails?.rowIDName[layerLevel - 1]]}}"
-                >
-                    <div
-                        class="expand-icons-container"
-                        *ngIf="sendDataToNextLayer(row[NTDetails?.nestedPropertyName[layerLevel - 1]]).dataSource.length > 0"
-                        (click)="expandDetails(row)"
-                        onclick="event.stopPropagation();"
-                    >
-                        <span
-                            class="expand-icon"
-                            [class.hide]="row?.expanded"
-                        >
+            <td mat-cell *matCellDef="let row" class="vs"
+                id="nt-td-expand-{{row[NTDetails?.rowIDName[layerLevel - 1]]}}">
+                <div class="columnCenter" id="nt-row-arrow-{{row[NTDetails?.rowIDName[layerLevel - 1]]}}">
+                    <div class="expand-icons-container" *ngIf="isRowExpandableIconVissible(row)"
+                        (click)="expandDetails(row)" onclick="event.stopPropagation();">
+                        <span class="expand-icon" [class.hide]="row?.expanded">
                             ▼
                         </span>
-                        <span
-                            class="expand-icon"
-                            [class.hide]="!row?.expanded"
-                        >
+                        <span class="expand-icon" [class.hide]="!row?.expanded">
                             ▲
                         </span>
                     </div>
@@ -74,174 +39,84 @@
         </ng-container>
 
         <!-- Check box - Select Column -->
-        <ng-container
-            matColumnDef="selected"
-            sticky="{{isColSticky('selected')}}"
-        >
+        <ng-container matColumnDef="selected" sticky="{{isColSticky('selected')}}">
 
-            <th
-                mat-header-cell
-                *matHeaderCellDef
-                class="vs"
-                id="nt-th-select"
-            >
-                <mat-checkbox
-                    id="cb-select-all"
-                    (click)="$event.stopPropagation()"
-                    [(ngModel)]="NTSettings.cbSelectAll"
-                    [checked]="NTSettings.cbSelectAll"
-                    (change)="selectAll($event)"
-                ></mat-checkbox>
+            <th mat-header-cell *matHeaderCellDef class="vs" id="nt-th-select">
+                <mat-checkbox id="cb-select-all" (click)="$event.stopPropagation()" [(ngModel)]="NTSettings.cbSelectAll"
+                    [checked]="NTSettings.cbSelectAll" (change)="selectAll($event)"></mat-checkbox>
             </th>
 
-            <td
-                mat-cell
-                *matCellDef="let row"
-                class="vs"
-                id="nt-td-select-{{row[NTDetails?.rowIDName[layerLevel - 1]]}}"
-            >
-                <div
-                    class="columnCenter"
-                    id="nt-row-cb-{{row[NTDetails?.rowIDName[layerLevel - 1]]}}"
-                >
-                    <mat-checkbox
-                        id="nt-ch-{{row[NTDetails?.rowIDName[layerLevel - 1]]}}"
-                        (change)="selectTableRow(row)"
-                        [checked]="row['selected']"
-                    ></mat-checkbox>
+            <td mat-cell *matCellDef="let row" class="vs"
+                id="nt-td-select-{{row[NTDetails?.rowIDName[layerLevel - 1]]}}">
+                <div class="columnCenter" id="nt-row-cb-{{row[NTDetails?.rowIDName[layerLevel - 1]]}}">
+                    <mat-checkbox id="nt-ch-{{row[NTDetails?.rowIDName[layerLevel - 1]]}}"
+                        (change)="selectTableRow(row)" [checked]="row['selected']"></mat-checkbox>
                 </div>
             </td>
         </ng-container>
 
         <!-- Control Btns Column -->
-        <ng-container
-            matColumnDef="ctrl"
-            sticky="{{isColSticky('ctrl')}}"
-        >
-            <th
-                mat-header-cell
-                *matHeaderCellDef
-                id="nt-th-ctrl"
-            ></th>
-            <td
-                mat-cell
-                *matCellDef="let row"
-                id="nt-td-ctrl-{{row[NTDetails?.rowIDName[layerLevel - 1]]}}"
-            >
-                <ak-table-control-btns
-                    [row]="row"
-                    [editableRowId]="editableRowId"
-                    [rowIDName]="NTDetails?.rowIDName[layerLevel - 1]"
-                    (editRowReq)="editRecord($event)"
-                    (saveRowReq)="saveRecord($event)"
-                    (removeRowReq)="removeRecord($event)"
-                >
+        <ng-container matColumnDef="ctrl" sticky="{{isColSticky('ctrl')}}">
+            <th mat-header-cell *matHeaderCellDef id="nt-th-ctrl"></th>
+            <td mat-cell *matCellDef="let row" id="nt-td-ctrl-{{row[NTDetails?.rowIDName[layerLevel - 1]]}}">
+                <ak-table-control-btns [row]="row" [editableRowId]="editableRowId"
+                    [rowIDName]="NTDetails?.rowIDName[layerLevel - 1]" (editRowReq)="editRecord($event)"
+                    (saveRowReq)="saveRecord($event)" (removeRowReq)="removeRecord($event)">
                 </ak-table-control-btns>
             </td>
         </ng-container>
 
         <!-- Remaining Columns -->
-        <ng-container
-            *ngFor="let col of displayColumns; let i of index"
-            matColumnDef="{{col}}"
-            sticky="{{isColSticky(col)}}"
-        >
+        <ng-container *ngFor="let col of displayColumns; let i of index" matColumnDef="{{col}}"
+            sticky="{{isColSticky(col)}}">
 
             <!-- Header -->
-            <th
-                mat-header-cell
-                *matHeaderCellDef
-                mat-sort-header
-                id="nt-th-{{col}}"
-                class="table-cell-th"
-            >
-                <div
-                    fxLayout="column"
-                    fxLayoutAlign="space-around stretch"
-                >
+            <th mat-header-cell *matHeaderCellDef mat-sort-header id="nt-th-{{col}}" class="table-cell-th">
+                <div fxLayout="column" fxLayoutAlign="space-around stretch">
                     {{NTProperties.tableColumnNames[col]}}
                     <p *ngIf="isHeaderCurrencyShown(col)">({{ NTDetails.currency }})</p>
                 </div>
             </th>
 
             <!-- Table Cells -->
-            <td
-                mat-cell
-                *matCellDef="let row"
-                id="nt-td-{{col}}"
-                class="table-cell-td"
-                [ngSwitch]="columnType(col)"
-            >
+            <td mat-cell *matCellDef="let row" id="nt-td-{{col}}" class="table-cell-td" [ngSwitch]="columnType(col)">
 
                 <!-- Input Field Column -->
-                <div
-                    *ngSwitchCase="'inputs'"
-                    id="td-input-{{row[NTDetails?.rowIDName[layerLevel - 1]]}}"
-                    class="td-inputFields"
-                    fxLayout="row"
-                    fxLayoutAlign="center center"
-                >
-                    <mat-form-field
-                        class="nested-input"
-                        fxLayout="row"
-                        fxLayoutAlign="center center"
-                    >
-                        <input
-                            matInput
-                            type="number"
-                            [(ngModel)]="row[col]"
-                            (change)="changeInputData(row, col)"
-                            onclick="event.stopPropagation();"
-                            id="input-{{col}}"
-                        >
+                <div *ngSwitchCase="'inputs'" id="td-input-{{row[NTDetails?.rowIDName[layerLevel - 1]]}}"
+                    class="td-inputFields" fxLayout="row" fxLayoutAlign="center center">
+                    <mat-form-field class="nested-input" fxLayout="row" fxLayoutAlign="center center">
+                        <input matInput type="number" [(ngModel)]="row[col]" (change)="changeInputData(row, col)"
+                            onclick="event.stopPropagation();" id="input-{{col}}">
                     </mat-form-field>
                 </div>
 
                 <!-- Numeric Column -->
-                <ak-numeric-with-currency-cell
-                    *ngSwitchCase="'numeric'"
-                    [num]="row[col]"
-                    [col]="col"
-                    [currencyType]="NTSettings?.currencyType"
-                    [indicator]="NTSettings?.indicator"
-                    [currency]="NTDetails?.currency"
-                >
+                <ak-numeric-with-currency-cell *ngSwitchCase="'numeric'" [num]="row[col]" [col]="col"
+                    [currencyType]="NTSettings?.currencyType" [indicator]="NTSettings?.indicator"
+                    [currency]="NTDetails?.currency">
                 </ak-numeric-with-currency-cell>
 
                 <!-- Date column -->
-                <ak-date-cells
-                    *ngSwitchCase="'dates'"
-                    [isFullDate]="NTSettings.fullDate"
-                    [colName]="col"
-                    [cellId]="row[NTDetails?.rowIDName[layerLevel - 1]]"
-                    [date]="row[col]"
-                ></ak-date-cells>
+                <ak-date-cells *ngSwitchCase="'dates'" [isFullDate]="NTSettings.fullDate" [colName]="col"
+                    [cellId]="row[NTDetails?.rowIDName[layerLevel - 1]]" [date]="row[col]"></ak-date-cells>
 
                 <!-- Text with dots and ToolTip -->
-                <div
-                    *ngSwitchCase="'toolTips'"
-                    class="txt-column-{{col}}"
+                <div *ngSwitchCase="'toolTips'" class="tooltip-cell txt-column-{{col}}"
                     id="toolTip-{{col}}-{{row[NTDetails?.rowIDName[layerLevel - 1]]}}"
-                    [class.recalculate]="row.clientRecalculation"
-                >
+                    [class.recalculate]="row.clientRecalculation">
+                    <span class="tooltiptext">{{row[col]}}</span>
                     <!-- [matTooltip]="row[col]" matTooltipPosition="above" -->
                     {{row[col]}}
                 </div>
 
                 <!-- Percentage Column -->
-                <div
-                    *ngSwitchCase="'prc'"
-                    class="percentage-{{col}}"
-                >
+                <div *ngSwitchCase="'prc'" class="percentage-{{col}}">
                     {{ row[col] || (0 | number :'1.2-2')}} {{ !row[col] ? '%' : ''}}
                 </div>
 
                 <!-- All Remaining columns -->
-                <div
-                    *ngSwitchDefault
-                    class="txt-column-{{col}}"
-                    id="row-{{col}}-span-{{row[NTDetails?.rowIDName[layerLevel - 1]]}}"
-                >
+                <div *ngSwitchDefault class="txt-column-{{col}}"
+                    id="row-{{col}}-span-{{row[NTDetails?.rowIDName[layerLevel - 1]]}}">
                     {{row[col]}}
                 </div>
 
@@ -250,33 +125,38 @@
 
         <!-- Nested Table Columns -->
         <ng-container matColumnDef="expandedDetail">
-            <td
-                mat-cell
-                *matCellDef="let element"
+            <td mat-cell *matCellDef="let element"
                 [attr.colspan]="NTProperties?.displayedColumns[layerLevel - 1].length"
                 [class.hideBorder]="!element[NTDetails?.nestedPropertyName[layerLevel]] && !element.expanded"
-                [class.details-expanded]="element.expanded"
-                class="large-nested-detail-nested-row-td"
-            >
-                <div
-                    class="large-nested-details-container"
-                    *ngIf="element[NTDetails?.nestedPropertyName[layerLevel - 1]]"
-                >
-                    <div
-                        class="inner-table mat-elevation-z8"
-                        *ngIf="element.expanded"
-                    >
+                [class.details-expanded]="element.expanded" class="large-nested-detail-nested-row-td">
+                <div [class.large-nested-details-container]="isDetailsHasContent(element)"
+                    *ngIf="element[NTDetails?.nestedPropertyName[layerLevel - 1]]">
+                    <div class="inner-table mat-elevation-z8" *ngIf="element.expanded">
 
-                        <ak-large-nested-table
-                            class="rows inner-details"
-                            id="large-nested-table-layer-{{ layerLevel }}"
-                            [NTData]="sendDataToNextLayer(element[NTDetails?.nestedPropertyName[layerLevel - 1]])"
-                            [NTDetails]="NTDetails"
-                            [NTSettings]="NTSettings"
-                            [NTProperties]="NTProperties"
-                            [layerLevel]="layerLevel + 1"
-                        >
-                        </ak-large-nested-table>
+                        <ng-container [ngTemplateOutlet]="isDetailsHasContent(element) ? details : serverSideDetails"
+                            [ngTemplateOutletContext]="{row:element}">
+                        </ng-container>
+
+                        <ng-template #details let-row='row'>
+                            <ak-large-nested-table class="rows inner-details"
+                                id="large-nested-table-layer-{{ layerLevel }}"
+                                [NTData]="sendDataToNextLayer(element[NTDetails?.nestedPropertyName[layerLevel - 1]])"
+                                [NTDetails]="NTDetails" [NTSettings]="NTSettings" [NTProperties]="NTProperties"
+                                [layerLevel]="layerLevel + 1">
+                            </ak-large-nested-table>
+                        </ng-template>
+
+                        <ng-template #serverSideDetails let-row='row'>
+
+                            <div *ngIf="NTSettings.areDetailsServerSide && inProgress">
+                                <mat-spinner color="primary" class="ak-table-details-loader"></mat-spinner>
+                            </div>
+
+                            <div
+                                *ngIf="inProgress && sendDataToNextLayer(row[NTDetails.nestedPropertyName[layerLevel - 1]]).dataSource.data.length > 0">
+                                {{ NTSettings?.noDataMSG }}
+                            </div>
+                        </ng-template>
 
                     </div>
                 </div>
@@ -284,32 +164,17 @@
         </ng-container>
 
         <tbody>
-            <tr
-                mat-header-row
-                *matHeaderRowDef="NTProperties.displayedColumns[layerLevel - 1]; sticky: true"
-            ></tr>
-            <tr
-                mat-row
-                *matRowDef="let row; columns: NTProperties.displayedColumns[layerLevel - 1];"
-                class="{{row?.level}}"
-                [id]=" 'row-' + row[NTDetails?.rowIDName[layerLevel - 1]]"
-            >
+            <tr mat-header-row *matHeaderRowDef="NTProperties.displayedColumns[layerLevel - 1]; sticky: true"></tr>
+            <tr mat-row *matRowDef="let row; columns: NTProperties.displayedColumns[layerLevel - 1];"
+                class="{{row?.level}}" [id]=" 'row-' + row[NTDetails?.rowIDName[layerLevel - 1]]">
             </tr>
-            <tr
-                mat-row
-                *matRowDef="let nestedRow; columns: ['expandedDetail']"
-                class="large-nested-detail-row"
-            ></tr>
+            <tr mat-row *matRowDef="let nestedRow; columns: ['expandedDetail']" class="large-nested-detail-row"></tr>
 
         </tbody>
     </table>
 
-    <mat-paginator
-        [pageSizeOptions]="[5, 10, 25, 50, 100]"
-        [class.hide]="NTSettings.isServerSide"
-        fxLayout="row"
-        fxLayoutAlign="start center"
-    >
+    <mat-paginator [pageSizeOptions]="NTSettings.pageSizeOptions" [class.hide]="NTSettings.isServerSide" fxLayout="row"
+        fxLayoutAlign="start center">
     </mat-paginator>
 
 </div>

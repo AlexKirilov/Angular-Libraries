@@ -4,15 +4,16 @@ import { of } from 'rxjs/internal/observable/of';
 import { nestedTableData, TableDataI } from './defaultTableData';
 
 import { NTDataI, NTDetailsI } from 'fin-nested-tables';
+import { MatTableDataSource } from '@angular/material/table';
 
 @Injectable({
   providedIn: 'root'
 })
 export class GetDataService {
 
-  public getData(page: number, perPage: number, sortName: string, direction: 'asc' | 'desc'): Observable<NTDataI> {
+  public async getData(page: number, perPage: number, sortName: string, direction: 'asc' | 'desc', isServerPagging: boolean): Promise<Observable<NTDataI>> {
     let res: TableDataI[] = [];
-    const data = [...nestedTableData];
+    const data = nestedTableData.filter(r => r);
 
     // Sort data
     if (sortName && sortName !== '' && direction) {
@@ -22,19 +23,28 @@ export class GetDataService {
       }
     }
 
-    // Grab data per page;
-    if (page >= 1 && perPage && perPage > 1) {
-      const start = (page - 1) * perPage;
-      const end = page * perPage;
-      res = data.splice(start, end);
-    } else {
-      res = data.slice();
-    }
+    if (isServerPagging) {
+      // Grab data per page;
+      if (page >= 1 && perPage && perPage > 1) {
+        const start = (page - 1) * perPage;
+        const end = page * perPage;
+        // res = data.splice(start, end);
+        let counter = -1;
+        res = data.filter(r => {
+          ++counter;
+          if (counter > start && counter <= end)
+            return true;
+          return false;
+        });
+      } else {
+        res = data;
+      }
+    } else res = data;
 
     const size = nestedTableData.length as number;
 
     const tmp = new Object() as NTDataI;
-    tmp.dataSource = data;
+    tmp.dataSource = new MatTableDataSource<any>(res)
 
     tmp.details = new Object() as NTDetailsI;
     tmp.details.pageSize = perPage;
@@ -48,6 +58,11 @@ export class GetDataService {
     tmp.details.sortDirection = direction ? 'desc' : 'asc';
     tmp.details.sortColumnName = sortName;
 
+    await this.delay(3000);
     return of(tmp);
+  }
+
+  delay(ms: number) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 }

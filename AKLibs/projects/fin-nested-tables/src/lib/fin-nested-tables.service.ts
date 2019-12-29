@@ -40,9 +40,18 @@ export class FinNestedTablesService {
   }
 
   isInputValueChange(data: any): boolean {
-    return data && data.currentValue ?
-      (this.toJSONstring(data.currentValue) !== (data.previousValue ?
-        this.toJSONstring(data.previousValue) : null)) : false;
+    if (data && data.currentValue) {
+      if (data.currentValue.dataSource && data.currentValue.dataSource.data) {
+        if (data.previousValue) {
+          return this.toJSONstring(data.currentValue.dataSource.data) !== (data.previousValue.dataSource.data)
+        } else {
+          return true;
+        }
+      } else {
+        return (this.toJSONstring(data.currentValue) !== (data.previousValue ? this.toJSONstring(data.previousValue) : null));
+      }
+    }
+    
   }
 
   validateIncomeData(arr: Array<any>): boolean {

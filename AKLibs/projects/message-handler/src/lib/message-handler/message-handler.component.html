@@ -1,0 +1,89 @@
+<p>message-handler works!</p>
+<section id="error-modal-wrapper">
+    <section id="modaw-container">
+
+        <ng-container *ngTemplateOutlet="titleArea"></ng-container>
+
+        <section class="body-container">
+
+            <mat-dialog-content>
+                <ng-container *ngTemplateOutlet="errorContent"></ng-container>
+            </mat-dialog-content>
+
+            <ng-container *ngTemplateOutlet="errorActionCtrlBtns"></ng-container>
+
+        </section>
+    </section>
+
+
+    <!-- Title Area - Header -->
+    <ng-template #titleArea>
+        <section class="header" mat-dialog-title *ngIf="data.msgType !== 'prompt' && data.msgType !== 'import' ">
+            <section fxLayout="row" fxLayoutAlign="space-between center">
+                <div fxFlex>
+                    <div class="icons">
+                        <i class="large material-icons" *ngIf="data.msgType == 'error' || data.type == 'error'"
+                            [class.error]="data.msgType == 'error'">error</i>
+                        <i class="large material-icons" *ngIf="data.msgType == 'warning'|| data.type == 'warning'"
+                            [class.warning]="data.msgType == 'warning'">warning</i>
+                        <i class="large material-icons" *ngIf="data.msgType == 'info'"
+                            [class.info]="data.msgType == 'info'">error_outline</i>
+                        <i class="large material-icons" *ngIf="data.msgType == 'status'"
+                            [class.status]="data.msgType == 'status'">notification_important</i>
+                        <i class="large material-icons" *ngIf="data.msgType == 'debug'"
+                            [class.debug]="data.msgType == 'debug'">bug_report</i>
+                        <i class="large material-icons" *ngIf="data.msgType == 'shortkeys'"
+                            [class.shortkeys]="data.msgType == 'shortkeys'">keyboard</i>
+                        <!-- feedback -->
+                        <i class="large material-icons" *ngIf="data.msgType == 'prompt'"
+                            [class.debug]="data.msgType == 'prompt'">help</i>
+                    </div>
+                    <div class="title">
+                        {{ data.title }}
+                    </div>
+                </div>
+
+                <div class="close" fxFlex="12px" (click)="close()"> <b>x</b></div>
+            </section>
+        </section>
+    </ng-template>
+
+
+    <!-- Content Area - Body -->
+    <ng-template #errorContent>
+        <p>{{ data.message }}</p>
+
+        <div class="import-content" *ngIf="data.msgType == 'import'">
+            <ng-container *ngTemplateOutlet="InputArea"></ng-container>
+        </div>
+
+    </ng-template>
+
+
+    <ng-template #InputArea>
+        <div *ngFor="let element of data.elements">
+            <mat-form-field>
+                <input matInput type="{{element.type}}" placeholder="{{element.placeholder}}"
+                    [(ngModel)]="element.value" [id]="element.field" required>
+            </mat-form-field>
+        </div>
+    </ng-template>
+
+
+    <!-- Action Buttons Area - Footer -->
+    <ng-template #errorActionCtrlBtns>
+        <section class="controls">
+            <mat-dialog-actions class="control-btns">
+                <button mat-raised-button mat-dialog-close
+                    *ngIf=" data.msgType !== 'prompt' && data.msgType !== 'import' ">OK</button>
+                <div *ngIf=" data.msgType == 'prompt' ">
+                    <button mat-button [mat-dialog-close]="false">NO</button>
+                    <button mat-raised-button [mat-dialog-close]="true">YES</button>
+                </div>
+                <div *ngIf=" data.msgType == 'import' ">
+                    <button mat-button [mat-dialog-close]="false">Cancel</button>
+                    <button mat-raised-button [mat-dialog-close]="data.elements" cdkFocusInitial>Add</button>
+                </div>
+            </mat-dialog-actions>
+        </section>
+    </ng-template>

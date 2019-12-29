@@ -1,1 +1,37 @@
-<p>msg-handler works!</p>
+<section id="message-handler-wrapper">
+    <section id="message-nadler-container" fxLayout="column" fxLayoutAlign="center stretch" fxLayoutGap="30px">
+  
+      <section id="btns" style="margin: 20px;" fxLayout="row wrap" fxLayoutAlign="space-around center" fxFlex="80%">
+  
+        <button mat-raised-button id="error-btn" class="test-btns" (click)="callDialog('error')">Error</button>
+  
+        <button mat-raised-button id="warning-btn" class="test-btns" (click)="callDialog('warning')">Warning</button>
+  
+        <button mat-raised-button id="info-btn" class="test-btns" (click)="callDialog('info')">Information</button>
+  
+        <button mat-raised-button id="status-btn" class="test-btns" (click)="callDialog('status')">Status</button>
+  
+        <button mat-raised-button id="debug-btn" class="test-btns" (click)="callDialog('debug')">Debug</button>
+  
+        <button mat-raised-button id="prompt-btn" class="test-btns" (click)="callDialog('prompt')">Prompt</button>
+  
+        <button mat-raised-button id="input-btn" class="test-btns" (click)="callDialog('input')">Input</button>
+  
+        <button mat-raised-button id="input-btn" class="test-btns" (click)="callDialog('logout')">Logout</button>
+  
+        <button mat-raised-button id="input-btn" class="test-btns" (click)="callDialog('requestErr')">Throw random request errors</button>
+      </section>
+  
+      <div fxLayout="column" fxLayoutAlign="center stretch" fxFlex="80%" *ngIf="btnText | async">
+        Callback message:
+        <mat-card class="example-card">
+          <mat-card-content>
+            <p>
+              {{ btnText | async }}
+            </p>
+          </mat-card-content>
+        </mat-card>
+      </div>
+  
+    </section>
+  </section>

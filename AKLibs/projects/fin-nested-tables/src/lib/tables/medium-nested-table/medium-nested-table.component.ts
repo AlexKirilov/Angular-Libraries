@@ -1,7 +1,15 @@
 import { Component, OnChanges, Input, Output, EventEmitter, ViewChild, SimpleChanges } from '@angular/core';
 import { NTDataI, NTDetails, NTSettingsI, NTPropertiesI, TableCtrlBtnsI } from '../../table-interfaces';
 import { Sort, MatPaginator, MatTableDataSource } from '@angular/material';
+import { FormControl } from '@angular/forms';
+
 import { FinNestedTablesService } from '../../fin-nested-tables.service';
+
+import { ConnectableObservable } from 'rxjs/internal/observable/ConnectableObservable';
+import { distinctUntilChanged } from 'rxjs/internal/operators/distinctUntilChanged';
+import { debounceTime } from 'rxjs/internal/operators/debounceTime';
+import { publish } from 'rxjs/internal/operators/publish';
+import { map } from 'rxjs/internal/operators/map';
 
 @Component({
   selector: 'ak-medium-nested-table',
@@ -15,11 +23,13 @@ export class MediumNestedTableComponent implements OnChanges {
   @Input() NTSettings: NTSettingsI;
   @Input() NTProperties: NTPropertiesI;
   @Input() layerLevel: number = 1;
+  @Input() inProgress: boolean = false;
 
   // @Output() getDetails = new EventEmitter<any>(); //TODO: Version 2
   @Output() Error = new EventEmitter<any>();
   @Output() sortColumnBy = new EventEmitter<Sort>();
   @Output() changeInputDataReq = new EventEmitter<any>();
+  @Output() filterTableDataReq = new EventEmitter<string>();
   @Output() updateTableRowDataReq = new EventEmitter<any>();
   @Output() expandCollapsAllReq = new EventEmitter<boolean>();
   @Output() selectDeselectAllReq = new EventEmitter<boolean>();
@@ -43,7 +53,10 @@ export class MediumNestedTableComponent implements OnChanges {
     data1: [],
     data2: [],
   };
-
+  
+  public filterCtrl = new FormControl('');
+  private ObservableConn: ConnectableObservable<any>;
+  
   constructor(private service: FinNestedTablesService) { }
 
   onError(err: any): void {
@@ -54,6 +67,9 @@ export class MediumNestedTableComponent implements OnChanges {
     if (this.NTData && this.NTDetails && this.NTSettings && this.NTProperties &&
       this.service.validateIncomeData([change.NTData, change.NTDetails, change.NTSettings, change.NTProperties])
     ) {
+      if (this.NTSettings.isDataFilterVisible && !this.ObservableConn) {
+        this.ifFilterData();
+      }
       this.onDataUpdate();
     } else { return 0; }
   }
@@ -99,7 +115,7 @@ export class MediumNestedTableComponent implements OnChanges {
         this.dataSource.paginator = this.paginator;
       }
 
-      this.dataSource.data = [...this.NTData.dataSource];
+      this.dataSource.data = [...this.NTData.dataSource.data];
     } catch (err) {
       console.warn('The table income data is corrupted, please, provide validated data.', err);
     }
@@ -130,14 +146,16 @@ export class MediumNestedTableComponent implements OnChanges {
     }
 
     this.dataSource.data.forEach((row: any) => {
-      row.selected = $event.checked || this.NTSettings.cbSelectAll;
+      if (row[this.NTDetails.nestedPropertyName[this.layerLevel - 1]].length > 0) {
+        row.selected = $event.checked || this.NTSettings.cbSelectAll;
+      }
     });
   }
 
   selectTableRow(row: any) {
     if (row) {
       row.selected = !row.selected;
-      this.updateTableRowDataReq.emit(row);
+      this.updateTableRowDataReq.emit({ row, type: 'selectRow', selected: row.selected, forLayer: this.layerLevel });
 
       if (this.NTSettings.cbSelectAll && !row.selected) {
         this.NTSettings.cbSelectAll = false;
@@ -168,7 +186,9 @@ export class MediumNestedTableComponent implements OnChanges {
       this.NTSettings.allExpanded = !this.NTSettings.allExpanded;
 
       this.dataSource.data.forEach((el: any) => {
-        el['expanded'] = this.NTSettings.allExpanded;
+        if (el[this.NTDetails.nestedPropertyName[this.layerLevel - 1]].length > 0) {
+          el['expanded'] = this.NTSettings.allExpanded;
+        }
       });
 
       // Send to the server
@@ -185,7 +205,7 @@ export class MediumNestedTableComponent implements OnChanges {
     row.expanded = !row.expanded;
 
     if (this.NTSettings.isServerSide) {
-      this.updateTableRowDataReq.emit({ row, forLayer: this.layerLevel });
+      this.updateTableRowDataReq.emit({ row, type: 'expandDetails', expanded: row.expanded, forLayer: this.layerLevel });
     }
   }
 
@@ -220,7 +240,37 @@ export class MediumNestedTableComponent implements OnChanges {
   //// To Inner table
   sendDataToNextLayer(LayerData: Array<string>): NTDataI {
     const newData: NTDataI = new Object() as NTDataI;
-    newData.dataSource = LayerData;
+    newData.dataSource = new MatTableDataSource<any>(LayerData || []);
     return newData;
   }
+
+
+  isRowExpandableIconVissible(row: any): boolean {
+    if (this.NTSettings.areDetailsServerSide) return true;
+    else if (this.isDetailsHasContent(row)) return true;
+    else return false;
+  }
+
+  isDetailsHasContent(row: any): boolean {
+    return this.sendDataToNextLayer(row[this.NTDetails.nestedPropertyName[this.layerLevel - 1]]).dataSource.data.length > 0
+  }
+
+  ifFilterData() {
+    this.ObservableConn = this.filterCtrl.valueChanges.pipe(
+      debounceTime(400),
+      distinctUntilChanged(),
+      map((filterValue: string) => {
+        if (this.NTSettings.isServerSide) {
+          this.inProgress = true;
+          this.filterTableDataReq.emit(filterValue.trim().toLowerCase());
+        } else {
+          this.dataSource.filter = filterValue.trim().toLowerCase();
+        }
+      })
+    ).pipe(
+      publish()
+    ) as ConnectableObservable<any>;
+    this.ObservableConn.connect();
+  }
+
 }

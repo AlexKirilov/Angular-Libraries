@@ -1,7 +1,15 @@
-import { Component, Input, Output, EventEmitter, ViewChild, SimpleChanges, OnChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, ViewChild, SimpleChanges, OnChanges, ElementRef } from '@angular/core';
 import { NTDataI, NTDetails, NTSettingsI, NTPropertiesI, TableCtrlBtnsI } from '../../table-interfaces';
 import { Sort, MatSort, MatPaginator, MatTableDataSource } from '@angular/material';
 import { FinNestedTablesService } from '../../fin-nested-tables.service';
+import { Observable } from 'rxjs/internal/Observable';
+import { debounceTime } from 'rxjs/internal/operators/debounceTime';
+import { distinctUntilChanged } from 'rxjs/internal/operators/distinctUntilChanged';
+import { map } from 'rxjs/internal/operators/map';
+import { fromEvent } from 'rxjs/internal/observable/fromEvent';
+import { FormControl } from '@angular/forms';
+import { ConnectableObservable } from 'rxjs/internal/observable/ConnectableObservable';
+import { publish } from 'rxjs/internal/operators/publish';
 
 @Component({
   selector: 'ak-large-nested-table',
@@ -15,10 +23,12 @@ export class LargeNestedTableComponent implements OnChanges {
   @Input() NTSettings: NTSettingsI;
   @Input() NTProperties: NTPropertiesI;
   @Input() layerLevel = 1;
+  @Input() inProgress: boolean = false;
 
   // @Output() getDetails = new EventEmitter<any>(); //TODO: Version 2
   @Output() sortColumnBy = new EventEmitter<Sort>();
   @Output() changeInputDataReq = new EventEmitter<any>();
+  @Output() filterTableDataReq = new EventEmitter<string>();
   @Output() updateTableRowDataReq = new EventEmitter<any>();
   @Output() expandCollapsAllReq = new EventEmitter<boolean>();
   @Output() selectDeselectAllReq = new EventEmitter<boolean>();
@@ -30,11 +40,12 @@ export class LargeNestedTableComponent implements OnChanges {
   public dataSource: any = new MatTableDataSource([]);
   public displayColumns: Array<any>;
   public editableRowId = false;
+  public filterCtrl = new FormControl('');
 
+  private ObservableConn: ConnectableObservable<any>;
   constructor(
     private service: FinNestedTablesService
   ) { }
-  counter = 0;
 
   defaultTableFunc() {
     this.dataSource.sort = this.sort;
@@ -48,8 +59,29 @@ export class LargeNestedTableComponent implements OnChanges {
         changes.NTData.currentValue.dataSource !== changes.NTData.previousValue.dataSource
       ))
     ) {
+      if (this.NTSettings.isDataFilterVisible && !this.ObservableConn) {
+        this.ifFilterData();
+      }
       this.onDataUpdate(changes);
     }
+  }
+
+  ifFilterData() {
+    this.ObservableConn = this.filterCtrl.valueChanges.pipe(
+      debounceTime(400),
+      distinctUntilChanged(),
+      map((filterValue: string) => {
+        if (this.NTSettings.isServerSide) {
+          this.inProgress = true;
+          this.filterTableDataReq.emit(filterValue.trim().toLowerCase());
+        } else {
+          this.dataSource.filter = filterValue.trim().toLowerCase();
+        }
+      })
+    ).pipe(
+      publish()
+    ) as ConnectableObservable<any>;
+    this.ObservableConn.connect();
   }
 
   selectAll($event: any) {
@@ -59,14 +91,16 @@ export class LargeNestedTableComponent implements OnChanges {
     }
 
     this.dataSource.data.forEach((row: any) => {
-      row.selected = $event.checked || this.NTSettings.cbSelectAll;
+      if (row[this.NTDetails.nestedPropertyName[this.layerLevel - 1]].length > 0) {
+        row.selected = $event.checked || this.NTSettings.cbSelectAll;
+      }
     });
   }
 
   selectTableRow(row: any) {
     if (row) {
       row.selected = !row.selected;
-      this.updateTableRowDataReq.emit(row);
+      this.updateTableRowDataReq.emit({ row, type: 'selectRow', selected: row.selected, forLayer: this.layerLevel });
 
       if (this.NTSettings.cbSelectAll && !row.selected) {
         this.NTSettings.cbSelectAll = false;
@@ -75,10 +109,9 @@ export class LargeNestedTableComponent implements OnChanges {
   }
 
   onDataUpdate(changes: SimpleChanges) {
-    // console.warn('onDataUpdate', ++this.counter);
     try {
       // This function is triggered even when the user hover over the table header names
-      this.dataSource.data = [...this.NTData.dataSource];
+      this.dataSource.data = [...this.NTData.dataSource.data];
       this.displayColumns = this.remainingColumns([...this.NTProperties.displayedColumns[this.layerLevel - 1]]);
 
       if (this.NTSettings.isServerSide) {
@@ -103,18 +136,23 @@ export class LargeNestedTableComponent implements OnChanges {
     event.stopPropagation();
     row.expanded = !row.expanded;
     if (this.NTSettings.isServerSide) {
-      this.updateTableRowDataReq.emit({ row, forLayer: this.layerLevel });
+      this.updateTableRowDataReq.emit({ row, type: 'expandDetails', expanded: row.expanded, forLayer: this.layerLevel });
     }
   }
 
   toggleDetailsTable() {
-    // console.info('toggleDetailsTable', ++this.counter);
+    let counter = 0;
     this.NTSettings.allExpanded = !this.NTSettings.allExpanded;
-    this.dataSource.data.forEach((el: any) => {
+    const tmp =  this.dataSource.data;
+    this.dataSource.data = [];
+    tmp.forEach((el: any) => {
+      console.log( 'COUNTER => ', ++counter);
       if (el[this.NTDetails.nestedPropertyName[this.layerLevel - 1]].length > 0) {
         el.expanded = this.NTSettings.allExpanded;
       }
     });
+    debugger
+    this.dataSource.data = tmp;
 
     // Send to the server
     if (this.NTSettings.isServerSide) {
@@ -123,13 +161,10 @@ export class LargeNestedTableComponent implements OnChanges {
   }
 
   changeInputData(row: any, col: string) {
-    // console.info('changeInputData', ++this.counter);
-    // { row: $row, col: $col } // tableData: this.NTData.dataSource,
     this.changeInputDataReq.emit({ layer: this.layerLevel, row, col });
   }
 
   getServerNestedPageData($event: any) {
-    // console.info('getServerNestedPageData', ++this.counter);
     // TODO: Version 2
     console.log('getServerNestedPageData => ', $event);
   }
@@ -182,7 +217,7 @@ export class LargeNestedTableComponent implements OnChanges {
   //// To Inner table
   sendDataToNextLayer(LayerData: Array<string>): NTDataI {
     const newData: NTDataI = new Object() as NTDataI;
-    newData.dataSource = LayerData;
+    newData.dataSource = new MatTableDataSource<any>(LayerData || []);
     return newData;
   }
 
@@ -193,5 +228,19 @@ export class LargeNestedTableComponent implements OnChanges {
     ) {
       this.sortColumnBy.emit(sort);
     }
+  }
+
+
+  isRowExpandableIconVissible(row: any): boolean {
+
+    if (this.NTSettings.areDetailsServerSide) return true;
+    else if (this.isDetailsHasContent(row)) return true;
+    else return false;
+  }
+
+  isDetailsHasContent(row: any): boolean {
+    console.log(row, this.NTDetails.nestedPropertyName[this.layerLevel - 1])
+    console.log(this.sendDataToNextLayer(row[this.NTDetails.nestedPropertyName[this.layerLevel - 1]]).dataSource.data.length > 0)
+    return this.sendDataToNextLayer(row[this.NTDetails.nestedPropertyName[this.layerLevel - 1]]).dataSource.data.length > 0
   }
 }

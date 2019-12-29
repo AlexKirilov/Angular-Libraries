@@ -1,4 +1,5 @@
 import { SortDirection } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
 
 export interface CustomiseErrorsI {
     type: 'error' | 'warning' | 'fatal' | 'info';
@@ -15,7 +16,7 @@ export class NTDetails {
 }
 
 export class NTDataI {
-    dataSource: Array<any>;
+    dataSource: MatTableDataSource<any>;
     details: NTDetailsI;
 }
 
@@ -39,6 +40,9 @@ export class NTSettingsI {
     cbSelectAll?: boolean;
     allExpanded?: boolean;
     isServerSide?: boolean;
+    isDataFilterVisible?: boolean;
+    areDetailsServerSide?: boolean;
+    pageSizeOptions?: Array<number>;
     indicator?: 'minus' | 'brackets' | null;
     currencyType?: 'inHeader' | 'inRow' | 'combine' | null;
 }

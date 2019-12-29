@@ -171,4 +171,56 @@
             text-align: left;
         }
     }
+
+    .mat-column-expandedDetail.details-expanded {
+
+        .large-nested-details-container,
+        .medium-nested-details-container,
+        .small-nested-details-container {
+            box-shadow: 0 5px 5px -3px rgba(0, 0, 0, 0.2), 0 8px 10px 1px rgba(0, 0, 0, 0.14), 0 3px 14px 2px rgba(0, 0, 0, 0.12);
+            margin: 10px 0;
+        }
+    }
+
+    .ak-table-details-loader {
+        margin: 0 auto;
+        max-width: 50px;
+        max-height: 50px;
+
+        svg {
+            width: 50px !important;
+            height: 50px !important;
+        }
+    }
+
+    // Simple Tooltip
+
+    .tooltip-cell .tooltiptext {
+        visibility: hidden;
+        width: 120px;
+        background-color: #000000a1;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px 0px;
+        position: absolute;
+        z-index: 999999;
+        top: -23px;
+        left: 0;
+    }
+
+    .tooltip-cell:hover .tooltiptext {
+        visibility: visible;
+    }
+
+    // Data filter input container
+    .ak-nested-data-filter {
+        display: flex;
+        background-color: #f6f6f6;
+
+        mat-form-field {
+            position: sticky;
+            left: 20px;
+        }
+    }
 }

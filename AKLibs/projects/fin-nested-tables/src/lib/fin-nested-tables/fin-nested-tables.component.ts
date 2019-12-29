@@ -35,6 +35,7 @@ export class FinNestedTablesComponent implements OnChanges {
   @Output() selectDeselectAll = new EventEmitter<boolean>();
   @Output() expandCollapsAll = new EventEmitter<boolean>();
   @Output() updateTableRowData = new EventEmitter<any>();
+  @Output() filterTableData = new EventEmitter<string>();
   @Output() changeInputData = new EventEmitter<any>();
   @Output() tableCTRLBTNRow = new EventEmitter<any>();
   @Output() sortColumnBy = new EventEmitter<any>();
@@ -45,12 +46,12 @@ export class FinNestedTablesComponent implements OnChanges {
   public isServerSide: boolean;
   public isTableCustomizable: boolean;
 
-
   // Inner properties with default values
   public displayLSize = true;
   public displayMSize = false;
   public displaySSize = false;
 
+  public inProgress = false;
   public isCustomise = false;
 
   fittingTableToScreenSize(innerWidth: number) {
@@ -83,12 +84,18 @@ export class FinNestedTablesComponent implements OnChanges {
     if (this.NTData && this.NTSettings && this.NTProperties) {
       if (this.NTDetails && this.NTDetails.rowIDName && this.NTDetails.nestedPropertyName) {
 
+        // Hide Progress Bar
+        this.inProgress = false;
+
         // Insure skipping columns to skip
         // expand, selected, ctrl and warning columns
         this.insureSkipSortingColumns();
 
         // Set all pagination details
         this.pagginationDetails = this.service.serverSidePaggDetails(this.NTData.details);
+
+        if (!this.NTSettings.pageSizeOptions)
+          this.NTSettings.pageSizeOptions = [5, 10, 25, 50];
 
         // Set necessary Settings
         this.isServerSide = this.NTSettings.isServerSide || false;
@@ -124,6 +131,8 @@ export class FinNestedTablesComponent implements OnChanges {
   // Output Functions
 
   updateTablePagginationData(page: number, itemsPerPage: number): void {
+    if (this.NTSettings.isServerSide)
+      this.inProgress = true;
     this.getServerPageData.emit({ page, itemsPerPage });
   }
 
@@ -136,10 +145,16 @@ export class FinNestedTablesComponent implements OnChanges {
   }
 
   expandCollapsAllReq($bool: boolean): void {
+    if (this.NTSettings.isServerSide)
+      this.inProgress = true;
     this.expandCollapsAll.emit($bool);
   }
 
   updateTableRowDataReq($event: any): void {
+    if (this.NTSettings.isServerSide &&
+      (!$event.row[this.NTDetails.rowIDName[this.layer - 1]] && $event.row[this.NTDetails.rowIDName[this.layer - 1]].lenght == 0)
+    )
+      this.inProgress = true;
     this.updateTableRowData.emit($event);
   }
 
@@ -153,8 +168,14 @@ export class FinNestedTablesComponent implements OnChanges {
 
   sortColumn(newSort: Sort): void {
     if (this.service.skipSortColmns(newSort, this.NTProperties.skipColumns)) {
+      if (this.NTSettings.isServerSide)
+        this.inProgress = true;
       this.sortColumnBy.emit(newSort);
     }
+  }
+
+  filterTableDataReq(filterValue: string) {
+    this.filterTableData.emit(filterValue);
   }
 
 }
